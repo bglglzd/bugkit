@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="bugkit logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff4a6e"/>
+      <stop offset="100%" stop-color="#ff7b3a"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="url(#g)"/>
+  <g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="60" cy="64" rx="22" ry="26" fill="#fff" stroke="none"/>
+    <line x1="60" y1="38" x2="60" y2="90"/>
+    <path d="M48 34 L40 24" />
+    <path d="M72 34 L80 24" />
+    <path d="M38 54 L24 48" />
+    <path d="M38 64 L22 64" />
+    <path d="M38 74 L24 82" />
+    <path d="M82 54 L96 48" />
+    <path d="M82 64 L98 64" />
+    <path d="M82 74 L96 82" />
+  </g>
+  <circle cx="52" cy="58" r="3" fill="#ff4a6e"/>
+  <circle cx="68" cy="58" r="3" fill="#ff4a6e"/>
+  <circle cx="56" cy="72" r="3" fill="#ff4a6e"/>
+  <circle cx="66" cy="78" r="3" fill="#ff4a6e"/>
+</svg>
