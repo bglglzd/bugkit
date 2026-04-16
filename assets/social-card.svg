@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="bugkit">
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff4a6e"/>
+      <stop offset="100%" stop-color="#ff7b3a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background: deep near-black, reverse of /dream cream -->
+  <rect width="1200" height="630" fill="#0d0d12"/>
+
+  <!-- Rounded-square icon centered above the wordmark -->
+  <g transform="translate(520, 165) scale(1.333)">
+    <rect width="120" height="120" rx="24" fill="url(#accent)"/>
+    <g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="60" cy="64" rx="22" ry="26" fill="#fff" stroke="none"/>
+      <line x1="60" y1="38" x2="60" y2="90"/>
+      <path d="M48 34 L40 24"/>
+      <path d="M72 34 L80 24"/>
+      <path d="M38 54 L24 48"/>
+      <path d="M38 64 L22 64"/>
+      <path d="M38 74 L24 82"/>
+      <path d="M82 54 L96 48"/>
+      <path d="M82 64 L98 64"/>
+      <path d="M82 74 L96 82"/>
+    </g>
+    <circle cx="52" cy="58" r="3" fill="#ff4a6e"/>
+    <circle cx="68" cy="58" r="3" fill="#ff4a6e"/>
+    <circle cx="56" cy="72" r="3" fill="#ff4a6e"/>
+    <circle cx="66" cy="78" r="3" fill="#ff4a6e"/>
+  </g>
+
+  <!-- Wordmark: /bugkit in heavy sans-serif, white -->
+  <text x="600" y="475"
+        font-family="'Segoe UI', -apple-system, system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-weight="900"
+        font-size="112"
+        fill="#ffffff"
+        text-anchor="middle"
+        letter-spacing="-2">/bugkit</text>
+</svg>
