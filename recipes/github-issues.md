@@ -137,6 +137,12 @@ Notifications are free — GitHub handles them.
 
 ---
 
+## Voice transcription (optional)
+
+The frontend modal is identical to the full web-app recipe. To add voice — Web Speech API default, local Whisper opt-in — follow the "Voice transcription (optional)" section in [`web-app-full.md`](./web-app-full.md). No backend changes needed; the description just arrives pre-populated from the mic.
+
+---
+
 ## Acceptance checklist
 
 - [ ] Submitting a report creates an issue with `bugkit` label
