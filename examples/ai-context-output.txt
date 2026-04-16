@@ -1,0 +1,30 @@
+=== BUG REPORT #42 ===
+Type: bug
+Status: open
+Reported: 2026-04-16T04:27:11.829Z by @op
+
+## Description
+when press bookmark - it does not become pressed (but when refresh page - it shows that it is bookmarked)
+
+## Page
+URL: https://gta6.forum/c/pc/a4738e55-7fd9-4b9a-8d00-8cfa4427b2d9/realistic-pc-release-timeline
+Viewport: 2133x1066
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:150.0) Gecko/20100101 Firefox/150.0
+
+## Selected Element
+Selector: button.btn.btn-ghost.btn-sm.cursor-pointer
+XPath: /html/body/div[3]/div[1]/main[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[1]/button[1]
+Tag: BUTTON
+Classes: btn btn-ghost btn-sm cursor-pointer
+Visible text: Bookmark
+Position: x=672 y=198 w=104 h=32
+HTML:
+<button class="btn btn-ghost btn-sm cursor-pointer" title="Bookmark thread"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg> Bookmark</button>
+
+## Instructions
+Fix this bug. When done:
+1. Summarize root cause and files changed.
+2. Provide a short "how to verify" note.
+3. Update the report via: PATCH /api/bug-reports/42
+   With: { status: 'resolved', resolution: '<short note>', commit_sha: '<sha>' }
+   (Or status 'wontfix' / 'closed' with a reason.)
