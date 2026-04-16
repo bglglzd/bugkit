@@ -1,0 +1,14 @@
+{
+  "name": "bugkit",
+  "owner": {
+    "name": "bglglzd"
+  },
+  "plugins": [
+    {
+      "name": "bugkit",
+      "source": "./",
+      "version": "1.0.0",
+      "description": "AI-friendly bug reports for any project."
+    }
+  ]
+}
