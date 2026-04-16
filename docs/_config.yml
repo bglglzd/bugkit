@@ -1,0 +1,5 @@
+# Tells GitHub Pages this is a static site, not Jekyll-rendered.
+# We ship plain HTML/CSS; Jekyll would otherwise try to process it.
+plugins: []
+include:
+  - .nojekyll
