@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>bugkit — Users click. AI fixes. Done.</title>
+  <meta name="description" content="AI-friendly bug reports for any project. Users report bugs with full context. Paste into Claude Code / Cursor / Copilot. Fix ships in minutes.">
+  <meta property="og:title" content="bugkit — Users click. AI fixes. Done.">
+  <meta property="og:description" content="AI-friendly bug reports for any project. Paste into any AI coding agent. Fix ships in minutes.">
+  <meta property="og:image" content="https://bglglzd.github.io/bugkit/og-image.svg">
+  <meta property="og:url" content="https://bglglzd.github.io/bugkit/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="../assets/logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <section class="hero">
+    <img src="../assets/logo.svg" alt="bugkit logo" class="logo">
+    <h1>bugkit</h1>
+    <div class="tagline">Users click. AI fixes. Done.</div>
+    <p class="subtitle">
+      AI-friendly bug reports for any project. Users report bugs with full context — URL, element selector, stack trace, viewport, voice transcript. Admins hit one button. Paste into Claude Code or any AI coding agent. Fix ships in minutes.
+    </p>
+    <div class="badges">
+      <a href="https://github.com/bglglzd/bugkit"><img alt="stars" src="https://img.shields.io/github/stars/bglglzd/bugkit?style=social"></a>
+      <a href="https://github.com/bglglzd/bugkit/blob/main/SPEC.md"><img alt="spec v1" src="https://img.shields.io/badge/spec-v1-blue"></a>
+      <a href="https://github.com/bglglzd/bugkit/blob/main/LICENSE"><img alt="license MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
+    </div>
+  </section>
+
+  <h2>Who this is for</h2>
+  <div class="personas">
+    <div class="persona">
+      <h3>🛠  Building for a client or boss</h3>
+      <p>Send them the staging link. They click the bug icon, pick the broken element, speak or type what they want. You paste the output into your AI coding agent. Fix ships the same day — exactly how they described it. No more "did they mean the header or the hero?"</p>
+    </div>
+    <div class="persona">
+      <h3>🚀  Running a product with users</h3>
+      <p>Users click the bug icon from inside your app. Reports arrive with full context — selector, stack trace, viewport, voice transcript. Paste → AI fixes → user gets notified. Your product improves as fast as you can read reports.</p>
+    </div>
+  </div>
+
+  <h2>Install — pick your AI agent</h2>
+  <div class="install-tabs">
+    <div class="tab-buttons">
+      <button class="tab-button active" data-tab="claude">Claude Code</button>
+      <button class="tab-button" data-tab="cursor">Cursor</button>
+      <button class="tab-button" data-tab="copilot">Copilot</button>
+      <button class="tab-button" data-tab="chatgpt">ChatGPT / Codex</button>
+      <button class="tab-button" data-tab="other">Other</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-claude">
+      <pre id="code-claude">/plugin marketplace add bglglzd/bugkit
+/plugin install bugkit@bglglzd-bugkit
+/bugkit:install</pre>
+      <button class="copy-btn" data-copy="code-claude">Copy</button>
+    </div>
+    <div class="tab-panel" id="tab-cursor">
+      <pre id="code-cursor">Install bugkit in this project from
+https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md</pre>
+      <button class="copy-btn" data-copy="code-cursor">Copy</button>
+    </div>
+    <div class="tab-panel" id="tab-copilot">
+      <pre id="code-copilot">Install bugkit in this project from
+https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md</pre>
+      <button class="copy-btn" data-copy="code-copilot">Copy</button>
+    </div>
+    <div class="tab-panel" id="tab-chatgpt">
+      <pre id="code-chatgpt">Install bugkit in this project from
+https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md</pre>
+      <button class="copy-btn" data-copy="code-chatgpt">Copy</button>
+    </div>
+    <div class="tab-panel" id="tab-other">
+      <p style="margin:0;color:var(--fg-muted);">Paste the full contents of <a href="https://github.com/bglglzd/bugkit/blob/main/INSTALL.md">INSTALL.md</a> into your AI chat. Works with Gemini CLI, Aider, Cline, and anything else that accepts a prompt.</p>
+    </div>
+  </div>
+
+  <h2>How it works</h2>
+  <div class="how-it-works">User finds bug
+  ↓  clicks bug icon, picks the broken element, speaks or types
+Report saved with full context (URL, selector, stack trace, viewport, transcript)
+  ↓
+Admin opens report → clicks "Copy Context for AI"
+  ↓  standardized prompt with everything the AI needs
+Paste into Claude Code / Cursor / Copilot / ChatGPT
+  ↓
+AI fixes the bug, ships a commit
+  ↓
+Admin marks report "resolved" with a short note + commit SHA
+  ↓
+Reporter gets notified</div>
+
+  <h2>Why this beats a feedback form</h2>
+  <table>
+    <thead>
+      <tr><th>Traditional feedback form</th><th>bugkit</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>"Something is broken"</td><td>Selector, XPath, HTML, viewport, URL, stack trace, voice transcript</td></tr>
+      <tr><td>Admin reads, asks clarifying questions</td><td>Admin pastes to AI, AI already has everything</td></tr>
+      <tr><td>Fix takes days</td><td>Fix ships in minutes</td></tr>
+      <tr><td>Format differs per project</td><td>Standardized spec — same ritual across all your projects</td></tr>
+      <tr><td>No closed-loop status</td><td>Reporter notified at each state change</td></tr>
+      <tr><td>Typing long descriptions is a chore</td><td>🎤 press-to-speak, auto-transcribed</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Voice — free, no keys, works on slow computers</h2>
+  <p style="color:var(--fg-muted);">
+    🎤 Mic button next to the description field. Press, speak, transcript streams into the textarea live. Edit if you want, submit.
+  </p>
+  <p style="color:var(--fg-muted);">
+    Default is the browser's <strong>Web Speech API</strong> — free, no install, no keys. Optional upgrade is <strong>local Whisper</strong> (whisper.cpp) for offline / Firefox / full privacy — ~150MB one-time model download, CPU-only. Never paid APIs as the default path.
+  </p>
+
+  <h2>Docs</h2>
+  <ul style="color:var(--fg-muted);">
+    <li><a href="https://github.com/bglglzd/bugkit/blob/main/SPEC.md">SPEC.md</a> — the portable data contract</li>
+    <li><a href="https://github.com/bglglzd/bugkit/tree/main/recipes">recipes/</a> — 7 sink adapters (DB, GitHub Issues, Telegram, JSONL, email, Slack/Discord, CLI)</li>
+    <li><a href="https://github.com/bglglzd/bugkit/blob/main/INSTALL.md">INSTALL.md</a> — universal paste-in prompt</li>
+    <li><a href="https://github.com/bglglzd/bugkit/blob/main/examples/ai-context-output.txt">Example AI context output</a></li>
+  </ul>
+
+  <footer>
+    MIT licensed · <a href="https://github.com/bglglzd/bugkit">Star on GitHub</a> · built by <a href="https://github.com/bglglzd">bglglzd</a>
+  </footer>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const buttons = document.querySelectorAll('.tab-button');
+  const panels = document.querySelectorAll('.tab-panel');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.tab;
+      buttons.forEach(b => b.classList.toggle('active', b === btn));
+      panels.forEach(p => p.classList.toggle('active', p.id === 'tab-' + t));
+    });
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const targetId = btn.dataset.copy;
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      try {
+        await navigator.clipboard.writeText(target.innerText);
+        const old = btn.innerText;
+        btn.innerText = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.innerText = old; btn.classList.remove('copied'); }, 1200);
+      } catch {
+        btn.innerText = 'Copy failed';
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>
