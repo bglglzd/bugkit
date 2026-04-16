@@ -116,4 +116,20 @@ MIT — use it anywhere, no attribution required (but stars are appreciated).
 
 ---
 
+<details>
+<summary>📘 Deploying the landing page</summary>
+
+The landing page lives in `docs/`. To enable it on GitHub Pages:
+
+1. Go to your repo's **Settings → Pages**.
+2. Under **Source**, pick **Deploy from a branch**.
+3. Branch: `main`, folder: `/docs`.
+4. Save. After ~1 minute, the page is live at `https://<your-username>.github.io/bugkit/`.
+
+`.nojekyll` is already in place so your HTML ships as-is.
+
+</details>
+
+---
+
 <sub>Want new bugkit releases in your inbox? **Star** or **Watch** this repo on GitHub — you'll be notified automatically.</sub>
