@@ -267,6 +267,162 @@ Reuse the project's existing notification plumbing if there is one.
 
 ---
 
+## Voice transcription (optional)
+
+Lets reporters speak their bug description instead of typing. Default is the browser's **Web Speech API** — free, no keys, zero server code. Optional upgrade is **local Whisper** (whisper.cpp) for offline / Firefox / privacy — no paid APIs.
+
+### Mic button in the modal
+
+Next to the description textarea, add:
+
+```html
+<button type="button" class="bugkit-mic-btn" aria-label="Record description">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+    <line x1="12" y1="19" x2="12" y2="23"></line>
+    <line x1="8" y1="23" x2="16" y2="23"></line>
+  </svg>
+</button>
+```
+
+Styles:
+
+```css
+.bugkit-mic-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border, #ccc); background: transparent; cursor: pointer;
+}
+.bugkit-mic-btn.recording {
+  border-color: #e53935; color: #e53935;
+  animation: bugkit-mic-pulse 1.2s infinite;
+}
+@keyframes bugkit-mic-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(229, 57, 53, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+}
+```
+
+### Web Speech path (default)
+
+```ts
+function attachVoice(textarea: HTMLTextAreaElement, micBtn: HTMLButtonElement) {
+  const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+  if (!SR) { micBtn.style.display = 'none'; return }  // hide gracefully
+
+  const rec = new SR()
+  rec.continuous = true
+  rec.interimResults = true
+  rec.lang = navigator.language || 'en-US'
+
+  let recording = false
+  let base = ''
+
+  rec.onresult = (e: any) => {
+    let interim = '', final = ''
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript
+      if (e.results[i].isFinal) final += t
+      else interim += t
+    }
+    textarea.value = (base + final + interim).trimStart()
+  }
+  rec.onerror = () => { stop() }
+  rec.onend = () => { if (recording) rec.start() }
+
+  function start() {
+    base = textarea.value ? textarea.value + ' ' : ''
+    recording = true
+    micBtn.classList.add('recording')
+    rec.start()
+  }
+  function stop() {
+    recording = false
+    micBtn.classList.remove('recording')
+    try { rec.stop() } catch {}
+  }
+
+  micBtn.addEventListener('click', () => { recording ? stop() : start() })
+  textarea.addEventListener('keydown', (e) => { if (e.key === 'Escape' && recording) stop() })
+}
+```
+
+Wire it on modal mount. That's the whole thing for the default path.
+
+### Local Whisper upgrade (optional)
+
+If the user wants offline / Firefox / full privacy, add a `/api/bugkit/transcribe` endpoint that proxies to whisper.cpp:
+
+```ts
+// Next.js App Router — adapt to your framework
+// For Express: app.post('/api/bugkit/transcribe', ...)
+// For FastAPI: @app.post('/api/bugkit/transcribe')
+export async function POST(req: Request) {
+  const url = process.env.BUGKIT_TRANSCRIBE_URL || 'http://localhost:9000/inference'
+  const formData = await req.formData()
+  const audio = formData.get('file') as Blob
+  if (!audio) return new Response('no audio', { status: 400 })
+  const up = new FormData()
+  up.append('file', audio, 'audio.webm')
+  up.append('response_format', 'text')
+  const r = await fetch(url, { method: 'POST', body: up })
+  if (!r.ok) return new Response('transcription failed', { status: 502 })
+  return new Response(await r.text(), { headers: { 'content-type': 'text/plain' } })
+}
+```
+
+Frontend auto-detects the endpoint once per session (cached in `sessionStorage`) and uses MediaRecorder instead of Web Speech when available:
+
+```ts
+async function detectTranscribeEndpoint(): Promise<boolean> {
+  const cached = sessionStorage.getItem('bugkit_transcribe_available')
+  if (cached !== null) return cached === '1'
+  try {
+    const ctrl = new AbortController()
+    const t = setTimeout(() => ctrl.abort(), 500)
+    const r = await fetch('/api/bugkit/transcribe', { method: 'OPTIONS', signal: ctrl.signal })
+    clearTimeout(t)
+    const ok = r.ok || r.status === 405
+    sessionStorage.setItem('bugkit_transcribe_available', ok ? '1' : '0')
+    return ok
+  } catch {
+    sessionStorage.setItem('bugkit_transcribe_available', '0')
+    return false
+  }
+}
+```
+
+When `detectTranscribeEndpoint()` returns true, record with MediaRecorder and POST the blob to `/api/bugkit/transcribe`. Otherwise use the Web Speech path above.
+
+**Run whisper.cpp locally (one-time setup):**
+
+```bash
+git clone https://github.com/ggerganov/whisper.cpp
+cd whisper.cpp && make
+./models/download-ggml-model.sh base.en
+./server -m models/ggml-base.en.bin --port 9000
+```
+
+~150MB model download, CPU-only, works offline. Set `BUGKIT_TRANSCRIBE_URL=http://localhost:9000/inference` if you run it elsewhere.
+
+### Privacy line under the textarea
+
+While recording, show a small italic note:
+- Web Speech path: *"Listening via Web Speech API (Chrome may send audio to Google servers)"*
+- Whisper path: *"Listening via local Whisper — stays on your machine"*
+
+### Paid-API footnote
+
+For OpenAI Whisper / Groq / Deepgram: point `BUGKIT_TRANSCRIBE_URL` at the provider and add `Authorization: Bearer ...` in the proxy route. This is a footnote, not the default — never recommend a paid API unprompted.
+
+### No SPEC change
+
+Voice is a UX layer. Description is populated from transcription; the portable format is unchanged. Audio blobs are not persisted in v1 — only the transcribed text.
+
+---
+
 ## Acceptance checklist
 
 - [ ] Bug icon visible in navbar, authenticated only
