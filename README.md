@@ -8,7 +8,9 @@
 
 *AI-friendly bug reports for any project. Users report bugs with full context (URL, element selector, stack trace, viewport, voice transcription). Admins hit one button. Paste into Claude Code — or any AI coding agent — and the fix ships. Reporter gets notified. Loop closes in minutes, not days.*
 
-<!-- Hero GIF goes here once recorded (see docs/superpowers/specs/ for shot list) -->
+<img src="./assets/hero.gif" alt="bugkit demo — user clicks the bug icon, picks an element, speaks a description, and Claude ships the fix" width="900" />
+
+<br><br>
 
 [![star on github](https://img.shields.io/github/stars/bglglzd/bugkit?style=social)](https://github.com/bglglzd/bugkit)
 [![spec v1](https://img.shields.io/badge/spec-v1-blue)](./SPEC.md)
