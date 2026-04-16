@@ -64,10 +64,39 @@
     </div>
 
     <div class="tab-panel active" id="tab-claude">
-      <pre id="code-claude">/plugin marketplace add bglglzd/bugkit
-/plugin install bugkit@bglglzd-bugkit
-/bugkit:install</pre>
-      <button class="copy-btn" data-copy="code-claude">Copy</button>
+      <ol class="install-steps">
+        <li>
+          <span class="step-num">1</span>
+          <div class="step-content">
+            <div class="step-label">Add the marketplace</div>
+            <div class="step-row">
+              <pre class="step-cmd">/plugin marketplace add bglglzd/bugkit</pre>
+              <button class="step-copy-btn" data-copy-text="/plugin marketplace add bglglzd/bugkit">Copy</button>
+            </div>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <div class="step-content">
+            <div class="step-label">Install the plugin</div>
+            <div class="step-row">
+              <pre class="step-cmd">/plugin install bugkit@bglglzd-bugkit</pre>
+              <button class="step-copy-btn" data-copy-text="/plugin install bugkit@bglglzd-bugkit">Copy</button>
+            </div>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <div class="step-content">
+            <div class="step-label">Run the installer</div>
+            <div class="step-row">
+              <pre class="step-cmd">/bugkit:install</pre>
+              <button class="step-copy-btn" data-copy-text="/bugkit:install">Copy</button>
+            </div>
+          </div>
+        </li>
+      </ol>
+      <p class="install-note">Run each command one at a time — wait for it to finish before pasting the next.</p>
     </div>
     <div class="tab-panel" id="tab-cursor">
       <pre id="code-cursor">Install bugkit in this project from
@@ -160,6 +189,22 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!target) return;
       try {
         await navigator.clipboard.writeText(target.innerText);
+        const old = btn.innerText;
+        btn.innerText = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.innerText = old; btn.classList.remove('copied'); }, 1200);
+      } catch {
+        btn.innerText = 'Copy failed';
+      }
+    });
+  });
+
+  // Per-step copy buttons on the Claude Code tab
+  document.querySelectorAll('.step-copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.copyText || '';
+      try {
+        await navigator.clipboard.writeText(text);
         const old = btn.innerText;
         btn.innerText = 'Copied';
         btn.classList.add('copied');
