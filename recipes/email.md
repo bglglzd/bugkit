@@ -109,14 +109,17 @@ Only if they provided an email. Skip if not.
 ```ts
 async function notifyReporter(report: BugReport) {
   if (!report.reporter.email) return
-  await resend.emails.send({
+  const escapeHtml = (value: string) => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>)[character])
+  const { data, error } = await resend.emails.send({
     from: process.env.BUGKIT_EMAIL_FROM!,
     to: report.reporter.email,
     subject: `Re: [${report.type.toUpperCase()} #${report.id}] ${report.title}`,
-    html: `<p>Your bug report has been marked <strong>${report.status}</strong>.</p>
-           ${report.resolution ? `<p>${report.resolution}</p>` : ''}
+    html: `<p>Your bug report has been marked <strong>${escapeHtml(report.status)}</strong>.</p>
+           ${report.resolution ? `<p>${escapeHtml(report.resolution)}</p>` : ''}
            <p style="color:#888;font-size:12px">bugkit · yourapp.com</p>`,
   })
+  if (error || !data?.id) throw new Error('Reporter email delivery rejected or returned no receipt')
+  return data
 }
 ```
 

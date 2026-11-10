@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>bugkit — Users click. AI fixes. Done.</title>
-  <meta name="description" content="AI-friendly bug reports for any project. Users report bugs with full context. Paste into Claude Code / Cursor / Copilot. Fix ships in minutes.">
-  <meta property="og:title" content="bugkit — Users click. AI fixes. Done.">
-  <meta property="og:description" content="AI-friendly bug reports for any project. Paste into any AI coding agent. Fix ships in minutes.">
+  <title>bugkit — reports with context for coding agents</title>
+  <meta name="description" content="AI-friendly bug reports for any project. Users report bugs with full context. Paste into Claude Code / Cursor / Copilot. Verify the generated patch and record its resolution.">
+  <meta property="og:title" content="bugkit — reports with context for coding agents">
+  <meta property="og:description" content="AI-friendly bug reports for any project. Paste into any AI coding agent. Verify the generated patch and record its resolution.">
   <meta property="og:image" content="https://bglglzd.github.io/bugkit/assets/og-image.svg">
   <meta property="og:url" content="https://bglglzd.github.io/bugkit/">
   <meta name="twitter:card" content="summary_large_image">
@@ -19,9 +19,9 @@
   <section class="hero">
     <img src="assets/logo.svg" alt="bugkit logo" class="logo">
     <h1>bugkit</h1>
-    <div class="tagline">Users click. AI fixes. Done.</div>
+    <div class="tagline">Reports with context for coding agents.</div>
     <p class="subtitle">
-      AI-friendly bug reports for any project. Users report bugs with full context — URL, element selector, stack trace, viewport, voice transcript. Admins hit one button. Paste into Claude Code or any AI coding agent. Fix ships in minutes.
+      AI-friendly bug reports for any project. Users report bugs with full context — URL, element selector, stack trace, viewport, voice transcript. Admins hit one button. Paste into Claude Code or any AI coding agent. Verify the generated patch and record its resolution.
     </p>
     <div class="badges">
       <a href="https://github.com/bglglzd/bugkit"><img alt="stars" src="https://img.shields.io/github/stars/bglglzd/bugkit?style=social"></a>
@@ -45,11 +45,11 @@
   <div class="personas">
     <div class="persona">
       <h3>🛠  Building for a client or boss</h3>
-      <p>Send them the staging link. They click the bug icon, pick the broken element, speak or type what they want. You paste the output into your AI coding agent. Fix ships the same day — exactly how they described it. No more "did they mean the header or the hero?"</p>
+      <p>Send them the staging link. They click the bug icon, pick the broken element, speak or type what they want. You paste the output into your AI coding agent. Verify the generated patch against their report. No more "did they mean the header or the hero?"</p>
     </div>
     <div class="persona">
       <h3>🚀  Running a product with users</h3>
-      <p>Users click the bug icon from inside your app. Reports arrive with full context — selector, stack trace, viewport, voice transcript. Paste → AI fixes → user gets notified. Your product improves as fast as you can read reports.</p>
+      <p>Users click the bug icon from inside your app. Reports arrive with full context — selector, stack trace, viewport, voice transcript. Copy context to your agent, verify its patch, and connect status notifications to your application.</p>
     </div>
   </div>
 
@@ -131,7 +131,7 @@ AI fixes the bug, ships a commit
   ↓
 Admin marks report "resolved" with a short note + commit SHA
   ↓
-Reporter gets notified</div>
+Application sends its configured status notification</div>
 
   <h2>Why this beats a feedback form</h2>
   <table>
@@ -141,9 +141,9 @@ Reporter gets notified</div>
     <tbody>
       <tr><td>"Something is broken"</td><td>Selector, XPath, HTML, viewport, URL, stack trace, voice transcript</td></tr>
       <tr><td>Admin reads, asks clarifying questions</td><td>Admin pastes to AI, AI already has everything</td></tr>
-      <tr><td>Fix takes days</td><td>Fix ships in minutes</td></tr>
+      <tr><td>Rebuild context in each conversation</td><td>Copy one predictable context block</td></tr>
       <tr><td>Format differs per project</td><td>Standardized spec — same ritual across all your projects</td></tr>
-      <tr><td>No closed-loop status</td><td>Reporter notified at each state change</td></tr>
+      <tr><td>No defined status flow</td><td>Status lifecycle and notification recipes</td></tr>
       <tr><td>Typing long descriptions is a chore</td><td>🎤 press-to-speak, auto-transcribed</td></tr>
     </tbody>
   </table>

@@ -30,6 +30,21 @@ test('canonical context preserves every populated SPEC section in order and sink
   assert.match(minimal, /Implement this feature/)
 })
 
+test('CLI context reuses the canonical formatter instead of a second section layout', async () => {
+  const {buildAIContext} = load(await snippet('recipes/web-app-full.md', '## The "Copy Context for AI" function'), ['buildAIContext'])
+  const {buildCLIContext} = load(await snippet('recipes/cli-tool.md', '## AI context format for CLI'), ['buildCLIContext'], {buildAIContext})
+  const input = {...report, environment: {...report.environment, platform: 'cli'}, logs: {console: ['Command: synthetic-tool check', 'CWD: /synthetic/project']}}
+  const hint = 'synthetic-tool bug close synthetic-report "<note>"'
+  assert.equal(buildCLIContext(input, hint), buildAIContext(input, hint))
+  assert.match(buildCLIContext(input, hint), /by @fixture/)
+})
+
+test('active landing copy and metadata make no minute or same-day fix promise', async () => {
+  const landing = await readFile(new URL('../docs/index.html', import.meta.url), 'utf8')
+  assert.doesNotMatch(landing, /Fix ships in minutes|Fix ships the same day|Reporter notified at each state change/)
+  assert.match(landing, /bugkit@bugkit/)
+})
+
 for (const [file, heading] of [
   ['recipes/web-app-full.md', '### Web Speech path (default)'],
   ['skills/adding-voice/SKILL.md', '### Mode 1: Web Speech API (default)'],
@@ -55,7 +70,7 @@ for (const [file, heading] of [
 }
 
 test('fixed picker outline and element coordinates share viewport space after scrolling', async () => {
-  const element = {closest: () => false, getBoundingClientRect: () => ({top: 30, left: 20, x: 20, y: 30, width: 50, height: 10}), tagName: 'BUTTON', id: 'fixture', className: '', innerText: 'Synthetic', outerHTML: '<button>Synthetic</button>'}
+  const element = {closest: () => false, getBoundingClientRect: () => ({top: 30, left: 20, x: 20, y: 30, width: 50, height: 10}), tagName: 'BUTTON', id: 'fixture', getAttribute: () => '', innerText: 'Synthetic', outerHTML: '<button>Synthetic</button>'}
   const {onMove, outline, extractContext} = load(await snippet('recipes/web-app-full.md', '## Element picker'), ['onMove', 'outline', 'extractContext'], {
     ref: value => ({value}), document: {elementFromPoint: () => element}, scrollY: 500, scrollX: 300,
     buildSelector: () => '#fixture', buildXPath: () => '/button',
@@ -63,6 +78,8 @@ test('fixed picker outline and element coordinates share viewport space after sc
   onMove({clientX: 20, clientY: 30})
   assert.equal(outline.value.top, '30px'); assert.equal(outline.value.left, '20px')
   assert.deepEqual(extractContext(element).rect, {x: 20, y: 30, w: 50, h: 10})
+  const svg = {...element, tagName: 'svg', className: {baseVal: 'synthetic-icon'}, getAttribute: () => ' synthetic-icon '}
+  assert.equal(extractContext(svg).classes, 'synthetic-icon')
 })
 
 test('GitHub CLI uses direct argv/body-file stdin, preserves literal title and propagates failure', async () => {
@@ -80,5 +97,7 @@ test('GitHub CLI uses direct argv/body-file stdin, preserves literal title and p
   assert.equal(captured.args[captured.args.indexOf('--title') + 1], title)
   assert.equal(captured.args[captured.args.indexOf('--body-file') + 1], '-')
   assert.equal(body, 'Synthetic complete context')
+  await createGhIssue({...report, type: 'feature'})
+  assert.equal(captured.args[captured.args.indexOf('--label') + 1], 'bugkit,feature')
   code = 1; await assert.rejects(createGhIssue(report), /failed/)
 })

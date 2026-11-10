@@ -78,7 +78,9 @@ Under the textarea, a small grey italic label: *"Listening via Web Speech API"* 
 
 ### Mode 2: Local Whisper (opt-in upgrade)
 
-Adds a thin backend proxy + uses MediaRecorder on the frontend. Works in every browser including Firefox, fully offline, no keys.
+Adds a thin backend proxy + uses MediaRecorder on the frontend. Supports browsers
+with MediaRecorder, including Firefox. After downloading the model, transcription
+runs offline on the machine hosting Whisper; no API key is needed.
 
 **Backend proxy** — add `/api/bugkit/transcribe`:
 
@@ -90,7 +92,7 @@ export async function POST(req: Request) {
   const url = process.env.BUGKIT_TRANSCRIBE_URL || 'http://localhost:9000/inference'
   const formData = await req.formData()
   const audio = formData.get('file') as Blob
-  if (!audio) return new Response('no audio', { status: 400 })
+  if (!(audio instanceof Blob) || audio.size === 0) return new Response('no audio', { status: 400 })
 
   const upstream = new FormData()
   upstream.append('file', audio, 'audio.webm')
@@ -130,13 +132,14 @@ async function recordAndTranscribe(textarea: HTMLTextAreaElement, micButton: HTM
   recorder.ondataavailable = (e) => chunks.push(e.data)
   recorder.onstop = async () => {
     stream.getTracks().forEach(t => t.stop())
-    const blob = new Blob(chunks, { type: 'audio/webm' })
+    const blob = new Blob(chunks, { type: recorder.mimeType })
     const fd = new FormData()
     fd.append('file', blob, 'audio.webm')
     const r = await fetch('/api/bugkit/transcribe', { method: 'POST', body: fd })
     if (r.ok) {
       const text = (await r.text()).trim()
       textarea.value = textarea.value ? textarea.value + ' ' + text : text
+      textarea.dispatchEvent(new Event('input', { bubbles: true }))
     }
     micButton.classList.remove('recording')
   }
@@ -153,14 +156,24 @@ Modal init: `if (await detectTranscribeEndpoint()) { /* use Whisper path */ } el
 **Local Whisper setup** — print this for the user to run once, outside the project:
 
 ```bash
-# One-time: install whisper.cpp and download a ~150MB model
-git clone https://github.com/ggerganov/whisper.cpp
-cd whisper.cpp && make
+# Prerequisites: Git, CMake, a C++ compiler, curl and FFmpeg on PATH.
+# POSIX shell; one-time setup, with a pinned upstream source snapshot.
+git clone https://github.com/ggml-org/whisper.cpp
+cd whisper.cpp
+git checkout d2c6f05a46dacf663e357bcf0ed40f542a72825d
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release --target whisper-server -j 2
 ./models/download-ggml-model.sh base.en
 
 # Each dev session: run the server
-./server -m models/ggml-base.en.bin --port 9000
+./build/bin/whisper-server -m models/ggml-base.en.bin --host 127.0.0.1 --port 9000 --convert
 ```
+
+`--convert` uses FFmpeg for browser recordings such as WebM/Opus or MP4/AAC.
+Keep this example server loopback-only and run it as an ordinary user in an
+isolated development environment. [Upstream server documentation](https://github.com/ggml-org/whisper.cpp/blob/d2c6f05a46dacf663e357bcf0ed40f542a72825d/examples/server/README.md)
+describes the conversion boundary. The recipe's automated checks use a synthetic
+HTTP endpoint; they do not run an actual Whisper model.
 
 Then set the env var (if different from default):
 ```
@@ -197,7 +210,8 @@ If the user explicitly wants OpenAI Whisper or Groq or Deepgram, point `BUGKIT_T
 
 While recording, show a small grey italic note below the textarea:
 - Web Speech path: *"Listening via Web Speech API (Chrome may send audio to Google servers)"*
-- Whisper path: *"Listening via local Whisper — stays on your machine"*
+- Whisper path: *"Transcribing on the configured Whisper server"* (identify that
+  server to the user; audio leaves the browser for its host).
 
 ## Verify
 

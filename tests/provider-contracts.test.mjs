@@ -38,6 +38,35 @@ const telegramEnv = {
   TELEGRAM_ADMIN_USER_IDS: '7,8', TELEGRAM_WEBHOOK_SECRET: syntheticSecret,
   BUGKIT_TELEGRAM_TRACKING: 'true',
 }
+
+for (const [file, heading] of [
+  ['recipes/web-app-full.md', '### Local Whisper upgrade (optional)'],
+  ['skills/adding-voice/SKILL.md', '### Mode 2: Local Whisper (opt-in upgrade)'],
+]) {
+  test(`${file}: Whisper proxy rejects missing audio and preserves browser bytes through loopback HTTP`, async () => {
+    await localService(async ({origin, guardedFetch, requests, mode}) => {
+      const {POST} = load(await snippet(file, heading), ['POST'], {
+        process: {env: {BUGKIT_TRANSCRIBE_URL: origin + '/synthetic-inference'}}, fetch: guardedFetch,
+      })
+      const request = value => {
+        const form = new FormData()
+        if (value !== undefined) form.append('file', value)
+        return new Request(origin + '/proxy', {method: 'POST', body: form})
+      }
+      for (const value of [undefined, 'not a file', new Blob([])]) {
+        assert.equal((await POST(request(value))).status, 400)
+      }
+      assert.equal(requests.length, 0)
+      const audio = new Blob(['synthetic browser audio bytes'], {type: 'audio/webm'})
+      const response = await POST(request(audio))
+      assert.equal(response.status, 200)
+      assert.ok(requests[0].raw.includes('synthetic browser audio bytes'))
+      assert.ok(requests[0].raw.includes('response_format'))
+      mode.httpError = true
+      assert.equal((await POST(request(audio))).status, 502)
+    })
+  })
+}
 const callback = (data, chat = -10042, user = 7) => ({callback_query: {id: 'synthetic-callback', data, from: {id: user}, message: {chat: {id: chat}, message_id: 10}}})
 const webhookRequest = (body, secret = syntheticSecret) => new Request('http://127.0.0.1/synthetic-webhook', {
   method: 'POST', headers: {'content-type': 'application/json', 'x-telegram-bot-api-secret-token': secret}, body: JSON.stringify(body),
@@ -153,6 +182,21 @@ test('Resend SDK rejection is surfaced even when its promise resolves', async ()
   })
   await assert.rejects(sendBugByEmail(report), /Email provider rejected/)
   rejected = false; assert.equal((await sendBugByEmail(report)).id, 'synthetic-mail')
+})
+
+test('reporter email notification skips absent addresses and propagates SDK rejection', async () => {
+  let rejected = true, calls = 0, payload
+  const resend = {emails: {send: async input => {
+    calls++; payload = input
+    return rejected ? {data: null, error: {message: 'synthetic failure'}} : {data: {id: 'synthetic-reporter-mail'}, error: null}
+  }}}
+  const {notifyReporter} = load(await snippet('recipes/email.md', '## Notify reporter on status change'), ['notifyReporter'], {resend})
+  await notifyReporter(report); assert.equal(calls, 0)
+  const input = {...report, reporter: {...report.reporter, email: 'fixture@example.invalid'}, resolution: '<b>Synthetic literal note</b>'}
+  await assert.rejects(notifyReporter(input), /Reporter email delivery rejected/)
+  rejected = false
+  assert.equal((await notifyReporter(input)).id, 'synthetic-reporter-mail')
+  assert.ok(payload.html.includes('&lt;b&gt;Synthetic literal note&lt;/b&gt;'))
 })
 
 test('GitHub issue rendering retains canonical context and assigns server IDs without rewriting user text', async () => {

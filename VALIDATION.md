@@ -23,7 +23,11 @@ The suite exercises:
 - Resend's resolved-promise error contract and GitHub issue-body reconstruction
   with explicit fake SDKs. No actual email or issue is created.
 - Literal CLI argv/stdin, synthetic speech-result sequences/restarts, and picker
-  coordinates with a synthetic scrolled browser object.
+  coordinates with synthetic scrolled HTML/SVG browser objects.
+- Both Whisper proxy snippets' input validation, multipart byte forwarding and
+  upstream HTTP rejection using a synthetic loopback endpoint. Setup commands
+  are checked against the linked upstream source; no actual Whisper server or
+  model is executed by this suite.
 
 These checks establish the supplied examples' contracts. They do not establish
 live provider credentials, a generated project's framework integration, real

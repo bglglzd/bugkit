@@ -13,3 +13,7 @@
   finalized voice segments and fix picker coordinates after scrolling.
 - Reject invalid terminal resolutions and propagate actual JSONL storage errors.
 - Add executable recipe contracts and Linux/Windows CI with synthetic boundaries.
+- Reuse the canonical CLI context, surface reporter-notification failures, handle
+  SVG picker classes and feature labels, and correct local Whisper setup/format
+  conversion instructions. Replace unsupported fix-time promises on the landing
+  page and share images with factual copy.

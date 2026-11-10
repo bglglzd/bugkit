@@ -105,7 +105,7 @@ function extractContext(el: Element) {
     xpath: buildXPath(el),
     tag: el.tagName,
     id: el.id,
-    classes: (el.className || '').trim(),
+    classes: (el.getAttribute('class') || '').trim(),
     text: (el as HTMLElement).innerText?.slice(0, 200) ?? '',
     html: el.outerHTML.slice(0, 1200),   // truncate
     rect: {
@@ -378,7 +378,9 @@ Wire it on modal mount. That's the whole thing for the default path.
 
 ### Local Whisper upgrade (optional)
 
-If the user wants offline / Firefox / full privacy, add a `/api/bugkit/transcribe` endpoint that proxies to whisper.cpp:
+For browsers with MediaRecorder (including Firefox), add a
+`/api/bugkit/transcribe` endpoint that proxies to whisper.cpp. Transcription runs
+offline after model download, on the machine hosting that server:
 
 ```ts
 // Next.js App Router — adapt to your framework
@@ -388,7 +390,7 @@ export async function POST(req: Request) {
   const url = process.env.BUGKIT_TRANSCRIBE_URL || 'http://localhost:9000/inference'
   const formData = await req.formData()
   const audio = formData.get('file') as Blob
-  if (!audio) return new Response('no audio', { status: 400 })
+  if (!(audio instanceof Blob) || audio.size === 0) return new Response('no audio', { status: 400 })
   const up = new FormData()
   up.append('file', audio, 'audio.webm')
   up.append('response_format', 'text')
@@ -424,19 +426,30 @@ When `detectTranscribeEndpoint()` returns true, record with MediaRecorder and PO
 **Run whisper.cpp locally (one-time setup):**
 
 ```bash
-git clone https://github.com/ggerganov/whisper.cpp
-cd whisper.cpp && make
+# Prerequisites: Git, CMake, a C++ compiler, curl and FFmpeg on PATH.
+# POSIX shell; pin the source snapshot used by this recipe.
+git clone https://github.com/ggml-org/whisper.cpp
+cd whisper.cpp
+git checkout d2c6f05a46dacf663e357bcf0ed40f542a72825d
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release --target whisper-server -j 2
 ./models/download-ggml-model.sh base.en
-./server -m models/ggml-base.en.bin --port 9000
+./build/bin/whisper-server -m models/ggml-base.en.bin --host 127.0.0.1 --port 9000 --convert
 ```
 
-~150MB model download, CPU-only, works offline. Set `BUGKIT_TRANSCRIBE_URL=http://localhost:9000/inference` if you run it elsewhere.
+The base.en model is about 150 MB. `--convert` requires FFmpeg for browser formats
+such as WebM/Opus or MP4/AAC. Run the loopback-only example server as an ordinary
+user in an isolated development environment. Set `BUGKIT_TRANSCRIBE_URL` to the
+actual server URL if needed. See the [voice recipe](../skills/adding-voice/SKILL.md)
+and [upstream server documentation](https://github.com/ggml-org/whisper.cpp/blob/d2c6f05a46dacf663e357bcf0ed40f542a72825d/examples/server/README.md).
+The automated proxy checks use synthetic HTTP responses, not a Whisper model.
 
 ### Privacy line under the textarea
 
 While recording, show a small italic note:
 - Web Speech path: *"Listening via Web Speech API (Chrome may send audio to Google servers)"*
-- Whisper path: *"Listening via local Whisper — stays on your machine"*
+- Whisper path: *"Transcribing on the configured Whisper server"* (identify its
+  host; audio leaves the browser for that server).
 
 ### Paid-API footnote
 
