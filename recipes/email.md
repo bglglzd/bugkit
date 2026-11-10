@@ -57,20 +57,27 @@ Text: {element.text}</pre>
 import { Resend } from 'resend'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-export async function sendBugByEmail(report: BugReport) {
-  const aiContext = buildAIContext(report)     // SPEC.md §3 template
+export async function sendBugByEmail(report: BugReport, updateHint: string) {
+  if (!updateHint?.trim()) throw new Error('A storage-specific update hint is required')
+  const aiContext = buildAIContext(report, updateHint)     // SPEC.md §3 template
 
-  await resend.emails.send({
+  const { data, error } = await resend.emails.send({
     from: process.env.BUGKIT_EMAIL_FROM!,
     to: process.env.BUGKIT_EMAIL_TO!,
     subject: `[${report.type.toUpperCase()} #${report.id}] ${report.title}`,
     html: renderHtml(report, aiContext),
     text: renderPlainText(report, aiContext),  // fallback
   })
+  if (error || !data?.id) throw new Error('Email provider rejected delivery or returned no receipt')
+  return data
 }
 ```
 
 Use any email library — `nodemailer`, `@sendgrid/mail`, `mailgun.js`, whatever the project already has.
+Pass the selected store's real update command. For JSONL, for example:
+`sendBugByEmail(report, 'node scripts/bugkit.js close ' + report.id + ' "<note>"')`.
+For a notification-only inbox use an explicit instruction to record the
+resolution in that inbox. Email delivery does not create a web PATCH endpoint.
 
 ---
 
@@ -87,7 +94,7 @@ Just send. No status tracking. Admins reply to the user directly when fixed. Sim
 Combine this recipe with `jsonl-file.md`:
 1. Store report in JSONL (the source of truth)
 2. Also email the admin
-3. Admin uses `bugkit close N "<note>"` CLI to update status
+3. Admin uses `node scripts/bugkit.js close N "<note>"` to update status
 4. Optionally, second email to the reporter when status changes (if they provided an email)
 
 ### C. Reply parsing (advanced)
@@ -107,14 +114,17 @@ Only if they provided an email. Skip if not.
 ```ts
 async function notifyReporter(report: BugReport) {
   if (!report.reporter.email) return
-  await resend.emails.send({
+  const escapeHtml = (value: string) => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>)[character])
+  const { data, error } = await resend.emails.send({
     from: process.env.BUGKIT_EMAIL_FROM!,
     to: report.reporter.email,
     subject: `Re: [${report.type.toUpperCase()} #${report.id}] ${report.title}`,
-    html: `<p>Your bug report has been marked <strong>${report.status}</strong>.</p>
-           ${report.resolution ? `<p>${report.resolution}</p>` : ''}
+    html: `<p>Your bug report has been marked <strong>${escapeHtml(report.status)}</strong>.</p>
+           ${report.resolution ? `<p>${escapeHtml(report.resolution)}</p>` : ''}
            <p style="color:#888;font-size:12px">bugkit · yourapp.com</p>`,
   })
+  if (error || !data?.id) throw new Error('Reporter email delivery rejected or returned no receipt')
+  return data
 }
 ```
 

@@ -98,3 +98,27 @@ test('a partial numeric ID cannot silently select a different report', async () 
     assert.match(result.stderr, /Not found/)
   })
 })
+
+test('empty and oversized resolution notes fail without changing stored reports', async () => {
+  await fixture(async directory => {
+    const original = record('synthetic-close')
+    await writeFile(join(directory, '.bugreports.jsonl'), JSON.stringify(original) + '\n')
+    for (const note of ['', '   ', 'x'.repeat(2001)]) {
+      const result = spawnSync(process.execPath, [join(directory, 'bugkit.js'), 'close', original.id, note], {cwd: directory, encoding: 'utf8'})
+      assert.equal(result.status, 1)
+      assert.match(result.stderr, /resolution note/)
+      assert.deepEqual(JSON.parse(cli(directory, 'show', original.id)), original)
+    }
+  })
+})
+
+test('missing storage starts empty while real read errors are reported', async () => {
+  await fixture(async directory => {
+    assert.equal(cli(directory, 'list'), '')
+    const {mkdir} = await import('node:fs/promises')
+    await mkdir(join(directory, '.bugreports.jsonl'))
+    const result = spawnSync(process.execPath, [join(directory, 'bugkit.js'), 'list'], {cwd: directory, encoding: 'utf8'})
+    assert.notEqual(result.status, 0)
+    assert.notEqual(result.stderr, '')
+  })
+})

@@ -12,7 +12,7 @@
 >
 > - **Any AI agent that doesn't auto-fetch URLs:** copy the content below the `---` line into the chat directly.
 >
-> **Claude Code users should NOT use this file.** Run `/plugin marketplace add bglglzd/bugkit`, `/plugin install bugkit@bglglzd-bugkit`, then `/bugkit:install` instead.
+> **Claude Code users should NOT use this file.** Run `/plugin marketplace add bglglzd/bugkit`, `/plugin install bugkit@bugkit`, then `/bugkit:install` instead.
 
 ---
 

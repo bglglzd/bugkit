@@ -105,42 +105,21 @@ Use `readline` or a small prompts library.
 
 ## AI context format for CLI
 
-Adapt SPEC.md §3 for CLI context (no DOM, no page, but commands and env instead):
+Use the canonical `buildAIContext` function from `web-app-full.md`, unchanged.
+Set `environment.platform` to `cli`, map tool version/commit/OS to the matching
+SPEC fields, and put optional command/CWD/runtime details in `logs.console`.
+Keep the standard labels and reporter prefix; omit empty web/DOM sections.
 
+```ts
+function buildCLIContext(report: BugReport, closeHint: string): string {
+  return buildAIContext(report, closeHint)
+}
 ```
-=== BUG REPORT #{id} ===
-Type: {type}
-Status: {status}
-Reported: {created_at} by {reporter.name}
 
-## Description
-{description}
-
-## Environment
-Tool: mytool v{app_version}
-Platform: {platform} / {os}
-Node: {node}
-
-## Command
-CWD: {cwd}
-Invoked: mytool {argv}
-Exit code: {exit_code}
-
-## Error
-{error.message}
-
-Stack:
-{error.stack}
-
-## Recent log
-{last N lines of ~/.mytool/error.log}
-
-## Instructions
-Fix this bug. When done:
-1. Summarize root cause and files changed.
-2. Provide a short "how to verify" note.
-3. Close the report: mytool bug close {id} "<short note>"
-```
+Pass a close hint matching your actual CLI storage command. The JSONL recipe
+shows its `node scripts/bugkit.js close REPORT_ID "<note>"` path; a tool with its
+own subcommand can supply that subcommand instead. Do not invent a web PATCH
+endpoint for a file-backed CLI.
 
 ---
 
@@ -162,16 +141,26 @@ If your CLI is open-source and you want reports to go to GitHub:
 - Requires `gh` CLI installed; fall back to JSONL if not
 
 ```ts
-async function createGhIssue(report: BugReport) {
-  const body = buildAIContext(report)
-  const cmd = `gh issue create --title ${quote(report.title)} --body - --label bugkit,bug`
-  const child = spawn('sh', ['-c', cmd], { stdio: ['pipe', 'inherit', 'inherit'] })
-  child.stdin.write(body)
-  child.stdin.end()
+async function createGhIssue(report: BugReport, updateHint: string) {
+  if (!updateHint?.trim()) throw new Error('A storage-specific update hint is required')
+  const body = buildAIContext(report, updateHint)
+  const child = spawn('gh', ['issue', 'create', '--title', report.title, '--body-file', '-', '--label', `bugkit,${report.type}`], {
+    shell: false, stdio: ['pipe', 'inherit', 'inherit'],
+  })
+  await new Promise<void>((resolve, reject) => {
+    child.once('error', reject)
+    child.stdin.on('error', reject)
+    child.once('close', code => code === 0 ? resolve() : reject(new Error(`GitHub issue creation failed (${code})`)))
+    child.stdin.end(body)
+  })
 }
 ```
 
 Fall back to JSONL if `gh` isn't available so users without it still get a working local log.
+Pass an explicit hint: for an issue-only store, use
+`gh issue close "<created-issue-URL>" --comment "<short note>"`; for a JSONL
+source of truth, use its actual local close command. A CLI must not inherit the
+web reference's PATCH endpoint.
 
 ---
 

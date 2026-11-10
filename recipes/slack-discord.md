@@ -80,42 +80,72 @@ Pick one or both.
 }
 ```
 
-Follow with a second message posted to the same channel containing `\`\`\`\n{SPEC.md §3 formatted}\n\`\`\`` so admins can copy-long-press.
+The examples above are optional previews, not containers for the complete context.
+Discord's content field is limited to 2,000 characters. The implementation below
+uploads the full UTF-8 context as a file; Slack receives ordered plain-text blocks
+under its 3,000-character limit. No context is silently truncated.
 
 ---
 
 ## Implementation (minimal)
 
 ```ts
-export async function postToChat(report: BugReport) {
-  const aiContext = buildAIContext(report)   // SPEC.md §3
+function splitText(text: string, limit = 2800): string[] {
+  const chunks: string[] = []
+  let current = ''
+  for (const character of text) {
+    if (current.length + character.length > limit) { chunks.push(current); current = '' }
+    current += character
+  }
+  if (current) chunks.push(current)
+  return chunks
+}
+
+export async function postToChat(report: BugReport, updateHint: string) {
+  if (!updateHint?.trim()) throw new Error('A storage-specific update hint is required')
+  const aiContext = buildAIContext(report, updateHint)   // SPEC.md §3
+  if (!process.env.BUGKIT_SLACK_WEBHOOK && !process.env.BUGKIT_DISCORD_WEBHOOK) throw new Error('No chat destination configured')
 
   if (process.env.BUGKIT_SLACK_WEBHOOK) {
-    await fetch(process.env.BUGKIT_SLACK_WEBHOOK, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(buildSlackMessage(report, aiContext)),
-    })
+    const chunks = splitText(aiContext)
+    for (let i = 0; i < chunks.length; i++) {
+      const response = await fetch(process.env.BUGKIT_SLACK_WEBHOOK, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          text: `bugkit report context (${i + 1}/${chunks.length})`,
+          blocks: [{ type: 'section', text: { type: 'plain_text', text: chunks[i], emoji: false } }],
+          unfurl_links: false, unfurl_media: false,
+        }), signal: AbortSignal.timeout(10000),
+      })
+      if (!response.ok || (await response.text()).trim() !== 'ok') throw new Error(`Slack delivery failed (${response.status})`)
+    }
   }
 
   if (process.env.BUGKIT_DISCORD_WEBHOOK) {
-    const hook = process.env.BUGKIT_DISCORD_WEBHOOK
-    await fetch(hook, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(buildDiscordEmbed(report)),
-    })
-    // Follow-up: full context in a code block for easy copy
-    await fetch(hook, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        content: '```\n' + aiContext + '\n```',
-      }),
-    })
+    const hook = new URL(process.env.BUGKIT_DISCORD_WEBHOOK)
+    hook.searchParams.set('wait', 'true')  // require Discord's delivery acknowledgement
+    const filename = `bug-${String(report.id).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 64)}.txt`
+    const form = new FormData()
+    form.append('payload_json', JSON.stringify({
+      content: 'bugkit report context attached', allowed_mentions: { parse: [] },
+      attachments: [{ id: 0, filename }],
+    }))
+    form.append('files[0]', new Blob([aiContext], { type: 'text/plain;charset=utf-8' }), filename)
+    const response = await fetch(hook, { method: 'POST', body: form, signal: AbortSignal.timeout(10000) })
+    if (!response.ok) throw new Error(`Discord delivery failed (${response.status})`)
   }
 }
 ```
+
+Use Node 24 LTS built-in fetch/FormData/Blob. The report store remains the source of
+truth. Pass its actual update command, for example
+`postToChat(report, 'node scripts/bugkit.js close ' + report.id + ' "<note>"')`
+for JSONL. For chat-only reports, pass an explicit instruction to record the
+resolution in the report's thread. Propagate delivery errors and expose partial delivery separately from a
+stored report; retrying after a partially accepted multi-message delivery can
+duplicate notifications. Configure request-size/rate limits for your application.
+See [Slack text limits](https://docs.slack.dev/reference/block-kit/composition-objects/text-object/)
+and [Discord webhook/file parameters](https://docs.discord.com/developers/resources/webhook#execute-webhook).
 
 ---
 
