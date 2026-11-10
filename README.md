@@ -8,7 +8,9 @@
 
 *AI-friendly bug reports for any project. Paste the report into Claude Code, Cursor, or any AI agent — and the fix ships in minutes.*
 
-<img src="./assets/hero.gif" alt="bugkit demo — user clicks the bug icon, picks an element, speaks a description, and Claude ships the fix" width="900" />
+<img src="./assets/workflow.svg" alt="Illustrated workflow: report a problem, collect context, hand it to an agent, verify the fix" width="900" />
+
+*Workflow illustration; integration and validation happen in your project.*
 
 <br><br>
 
