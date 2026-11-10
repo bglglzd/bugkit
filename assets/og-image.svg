@@ -34,7 +34,7 @@
 
   <g transform="translate(100, 500)">
     <rect width="1000" height="80" rx="12" fill="#ffffff0a" stroke="#ffffff22"/>
-    <text x="30" y="50" fill="#d0d0d8" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="26">
+    <text x="30" y="50" fill="#d0d0d8" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="20">
       /plugin marketplace add bglglzd/bugkit  ·  /plugin install  ·  /bugkit:install
     </text>
   </g>
