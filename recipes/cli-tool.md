@@ -164,10 +164,15 @@ If your CLI is open-source and you want reports to go to GitHub:
 ```ts
 async function createGhIssue(report: BugReport) {
   const body = buildAIContext(report)
-  const cmd = `gh issue create --title ${quote(report.title)} --body - --label bugkit,bug`
-  const child = spawn('sh', ['-c', cmd], { stdio: ['pipe', 'inherit', 'inherit'] })
-  child.stdin.write(body)
-  child.stdin.end()
+  const child = spawn('gh', ['issue', 'create', '--title', report.title, '--body-file', '-', '--label', 'bugkit,bug'], {
+    shell: false, stdio: ['pipe', 'inherit', 'inherit'],
+  })
+  await new Promise<void>((resolve, reject) => {
+    child.once('error', reject)
+    child.stdin.on('error', reject)
+    child.once('close', code => code === 0 ? resolve() : reject(new Error(`GitHub issue creation failed (${code})`)))
+    child.stdin.end(body)
+  })
 }
 ```
 

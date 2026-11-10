@@ -79,8 +79,8 @@ function onMove(e: MouseEvent) {
   const rect = el.getBoundingClientRect()
   outline.value = {
     display: 'block',
-    top: rect.top + scrollY + 'px',
-    left: rect.left + scrollX + 'px',
+    top: rect.top + 'px',
+    left: rect.left + 'px',
     width: rect.width + 'px',
     height: rect.height + 'px',
   }
@@ -110,7 +110,7 @@ function extractContext(el: Element) {
     html: el.outerHTML.slice(0, 1200),   // truncate
     rect: {
       x: Math.round(rect.x),
-      y: Math.round(rect.y + scrollY),
+      y: Math.round(rect.y),
       w: Math.round(rect.width),
       h: Math.round(rect.height),
     },
@@ -197,7 +197,7 @@ Full report detail + resolution note (if status is terminal) + a link back to th
 This is the heart of bugkit. The output MUST match `SPEC.md §3` exactly. Rough TypeScript:
 
 ```ts
-function buildAIContext(r: BugReport): string {
+function buildAIContext(r: BugReport, updateHint = `PATCH /api/bug-reports/${encodeURIComponent(String(r.id))}`): string {
   const lines: string[] = []
   lines.push(`=== BUG REPORT #${r.id} ===`)
   lines.push(`Type: ${r.type}`)
@@ -207,15 +207,27 @@ function buildAIContext(r: BugReport): string {
   lines.push('## Description')
   lines.push(r.description)
   lines.push('')
-  if (r.page_url || r.viewport || r.user_agent) {
-    lines.push('## Page')
-    if (r.page_url) lines.push(`URL: ${r.page_url}`)
-    if (r.viewport) lines.push(`Viewport: ${r.viewport}`)
-    if (r.user_agent) lines.push(`User Agent: ${r.user_agent}`)
+  const environment = r.environment || {}
+  if (environment.app_version || environment.commit || environment.platform || environment.os) {
+    lines.push('## Environment')
+    if (environment.app_version || environment.commit) lines.push(`App: ${environment.app_version || ''} (commit ${environment.commit || ''})`)
+    if (environment.platform) lines.push(`Platform: ${environment.platform}`)
+    if (environment.os) lines.push(`OS: ${environment.os}`)
     lines.push('')
   }
-  if (r.element_context) {
-    const e = r.element_context
+  // Canonical SPEC v1 fields; the fallback reads older flattened app records.
+  const page = r.page || { url: r.page_url }
+  const client = r.client || { viewport: r.viewport, user_agent: r.user_agent }
+  if (page.url || page.route || client.viewport || client.user_agent) {
+    lines.push('## Page')
+    if (page.url) lines.push(`URL: ${page.url}`)
+    if (page.route) lines.push(`Route: ${page.route}`)
+    if (client.viewport) lines.push(`Viewport: ${client.viewport}`)
+    if (client.user_agent) lines.push(`User Agent: ${client.user_agent}`)
+    lines.push('')
+  }
+  const e = r.element || r.element_context
+  if (e && Object.values(e).some(value => value !== undefined && value !== null && value !== '')) {
     lines.push('## Selected Element')
     if (e.selector) lines.push(`Selector: ${e.selector}`)
     if (e.xpath) lines.push(`XPath: ${e.xpath}`)
@@ -227,13 +239,25 @@ function buildAIContext(r: BugReport): string {
     if (e.html) { lines.push('HTML:'); lines.push(e.html) }
     lines.push('')
   }
+  if (r.error?.message || r.error?.stack) {
+    lines.push('## Error')
+    if (r.error.message) lines.push(`Message: ${r.error.message}`)
+    if (r.error.stack) lines.push('Stack:', r.error.stack)
+    lines.push('')
+  }
+  if (r.logs?.console?.length) {
+    lines.push('## Recent Console', r.logs.console.join('\n'), '')
+  }
+  if (r.attachments?.length) {
+    lines.push('## Attachments', ...r.attachments.map(a => `- ${a.type}: ${a.url}`), '')
+  }
   lines.push('## Instructions')
   lines.push(`${r.type === 'bug' ? 'Fix this bug' : 'Implement this feature'}. When done:`)
   lines.push('1. Summarize root cause and files changed.')
   lines.push('2. Provide a short "how to verify" note.')
-  lines.push(`3. Update the report via: PATCH /api/bug-reports/${r.id}`)
-  lines.push(`   With: { status: 'resolved', resolution: '<short note>', commit_sha: '<sha>' }`)
-  lines.push(`   (Or status 'wontfix' / 'closed' with a reason.)`)
+  lines.push(`3. Update the report via: ${updateHint}`)
+  lines.push('   With: { status: "resolved", resolution: "<short note>", commit_sha: "<sha>" }')
+  lines.push('   (Or status "wontfix" / "closed" with a reason.)')
   return lines.join('\n')
 }
 
@@ -321,16 +345,17 @@ function attachVoice(textarea: HTMLTextAreaElement, micBtn: HTMLButtonElement) {
   let base = ''
 
   rec.onresult = (e: any) => {
-    let interim = '', final = ''
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript
-      if (e.results[i].isFinal) final += t
-      else interim += t
-    }
-    textarea.value = (base + final + interim).trimStart()
+    const speech = Array.from(e.results, (result: any) => result[0].transcript.trim()).filter(Boolean).join(' ')
+    textarea.value = (base + speech).trimStart()
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
   }
   rec.onerror = () => { stop() }
-  rec.onend = () => { if (recording) rec.start() }
+  rec.onend = () => {
+    if (recording) {
+      base = textarea.value ? textarea.value + ' ' : ''
+      try { rec.start() } catch { stop() }
+    }
+  }
 
   function start() {
     base = textarea.value ? textarea.value + ' ' : ''

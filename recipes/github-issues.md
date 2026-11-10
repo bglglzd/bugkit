@@ -28,55 +28,13 @@ No database, no admin UI. Bug reports open as GitHub Issues with a `bugkit` labe
 
 Since there's no admin UI to add a "Copy Context" button later, **write the AI context into the issue body at creation time** inside a collapsible `<details>` block. Admins click to expand, copy, paste into Claude.
 
-Issue body template:
-
-```markdown
-**Reporter:** @{reporter.name}
-**Type:** {type}
-**Page:** {page.url}
-**Viewport:** {viewport}
-
-## Description
-{description}
-
-<details>
-<summary>🤖 Copy this into Claude Code</summary>
-
-```
-=== BUG REPORT #{issue_number} ===
-Type: {type}
-Status: open
-Reported: {created_at} by @{reporter.name}
-
-## Description
-{description}
-
-## Page
-URL: {page.url}
-Viewport: {viewport}
-User Agent: {user_agent}
-
-## Selected Element
-Selector: {element.selector}
-XPath: {element.xpath}
-Tag: {element.tag}
-Visible text: {element.text}
-HTML:
-{element.html}
-
-## Instructions
-{Fix this bug | Implement this feature}. When done:
-1. Summarize root cause and files changed.
-2. Provide a short "how to verify" note.
-3. Close this issue with a comment using `/resolved <commit-sha>` or via:
-   gh issue close {issue_number} --comment "<short note>"
-   (Or `/wontfix <reason>` to refuse.)
-```
-
-</details>
-```
-
-**Note:** The `#{issue_number}` goes in AFTER GitHub assigns the number on creation. Easiest: create the issue with a placeholder `#PENDING`, then immediately edit the body substituting the real number. Or use the returned `issue.number` to construct a second request.
+Use the canonical `buildAIContext` function from `web-app-full.md`, passing the
+GitHub issue number and a GitHub-specific close command as `updateHint`. Do not
+maintain a shorter second template: populated environment, page, element, error,
+console and attachment sections must all remain available. The implementation
+below chooses a code fence longer than any run inside the report, so report text
+stays literal. After creation it rebuilds the context using the assigned issue
+number rather than replacing matching text inside the user's description.
 
 ---
 
@@ -102,13 +60,23 @@ Create these labels once during install.
 import { Octokit } from '@octokit/rest'
 const gh = new Octokit({ auth: process.env.GITHUB_TOKEN })
 
+function renderIssueBody(report: BugReport & { issue_number: number | string }) {
+  const context = buildAIContext({ ...report, id: report.issue_number }, `gh issue close ${report.issue_number} --comment "<short note>"`)
+  const fence = '`'.repeat(Math.max(3, ...[...(context.match(/`+/g) || [])].map(run => run.length + 1)))
+  return ['<!-- bugkit_spec: 1 -->', '<details>', '<summary>🤖 Copy this into Claude Code</summary>', '', fence + 'text', context, fence, '', '</details>'].join('\n')
+}
+
 export async function createBugReport(input: BugReportInput) {
+  const report: BugReport = {
+    ...input, id: 'PENDING', bugkit_spec: '1', type: input.type || 'bug',
+    title: extractTitle(input.description), status: 'open', created_at: new Date().toISOString(),
+  }
   const issue = await gh.issues.create({
     owner: process.env.GITHUB_OWNER!,
     repo: process.env.GITHUB_REPO!,
-    title: `[${input.type}] ${extractTitle(input.description)}`,
-    body: renderIssueBody({ ...input, issue_number: 'PENDING' }),
-    labels: ['bugkit', input.type === 'feature' ? 'feature' : 'bug'],
+    title: `[${report.type}] ${extractTitle(report.description)}`,
+    body: renderIssueBody({ ...report, issue_number: 'PENDING' }),
+    labels: ['bugkit', report.type === 'feature' ? 'feature' : 'bug'],
   })
 
   // Second pass: replace PENDING with real issue number
@@ -116,7 +84,7 @@ export async function createBugReport(input: BugReportInput) {
     owner: process.env.GITHUB_OWNER!,
     repo: process.env.GITHUB_REPO!,
     issue_number: issue.data.number,
-    body: issue.data.body!.replace(/#PENDING/g, `#${issue.data.number}`),
+    body: renderIssueBody({ ...report, issue_number: issue.data.number }),
   })
 
   return { id: issue.data.number, url: issue.data.html_url }
@@ -131,7 +99,10 @@ Admin workflow:
 1. Triage in github.com → expand `🤖 Copy this into Claude Code` details → copy → paste into Claude Code
 2. Claude fixes, commits, references the issue (`Fixes #42`)
 3. Merging the PR auto-closes the issue
-4. Reporter is notified by GitHub (they're subscribed automatically as the issue author)
+4. Notify the app reporter through your application's status channel. A server
+   token makes the token owner/bot the GitHub issue author; the app reporter is
+   not automatically subscribed. GitHub notifications cover the actual author
+   and subscribers, or users you deliberately and correctly associate with it.
 
 Notifications are free — GitHub handles them.
 

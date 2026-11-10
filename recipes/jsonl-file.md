@@ -39,11 +39,11 @@ const FILE = './.bugreports.jsonl'
 
 export async function createBugReport(input: BugReportInput) {
   const report = {
+    ...input,
     bugkit_spec: '1',
     id: randomUUID(),
     status: 'open',
     created_at: new Date().toISOString(),
-    ...input,
     title: extractTitle(input.description),
   }
   await appendFile(FILE, JSON.stringify(report) + '\n', 'utf8')
@@ -57,7 +57,10 @@ export async function createBugReport(input: BugReportInput) {
 
 ```ts
 export async function listReports(filter?: { status?: string, type?: string }) {
-  const raw = await readFile(FILE, 'utf8').catch(() => '')
+  const raw = await readFile(FILE, 'utf8').catch(error => {
+    if (error.code === 'ENOENT') return ''
+    throw error
+  })
   const reports = raw.split('\n').filter(Boolean).map(l => JSON.parse(l))
   if (!filter) return reports.reverse()   // newest first
   return reports.filter(r =>
@@ -159,11 +162,12 @@ else if (cmd === 'show') {
 }
 else if (cmd === 'copy') {
   const r = await findReport(args[0])
-  process.stdout.write(buildAIContext(r))
+  process.stdout.write(buildAIContext(r, `node scripts/bugkit.js close ${JSON.stringify(String(r.id))} "<note>"`))
 }
 else if (cmd === 'close') {
   const r = await findReport(args[0])
-  const resolution = args.slice(1).join(' ')
+  const resolution = args.slice(1).join(' ').trim()
+  if (!resolution || resolution.length > 2000) { console.error('A resolution note of 1–2000 characters is required'); process.exit(1) }
   await updateReport(r.id, { status: 'resolved', resolution, resolved_at: new Date().toISOString() })
   console.log(`#${r.id} resolved.`)
 }

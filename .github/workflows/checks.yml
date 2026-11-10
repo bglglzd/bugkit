@@ -1,0 +1,25 @@
+name: Recipe checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: recipes-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  recipes:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Execute recipe contracts without external delivery
+        run: node --test tests/*.test.mjs
+      - name: Verify patch whitespace
+        run: git diff --check

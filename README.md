@@ -4,9 +4,9 @@
 
 # bugkit
 
-**Users click. AI fixes. Done.**
+**Bug reports with context your coding agent can use.**
 
-*AI-friendly bug reports for any project. Paste the report into Claude Code, Cursor, or any AI agent — and the fix ships in minutes.*
+*Capture the page, selected element and errors with a report. Give the structured context to your coding agent, verify its patch, and record the resolution.*
 
 <img src="./assets/workflow.svg" alt="Illustrated workflow: report a problem, collect context, hand it to an agent, verify the fix" width="900" />
 
@@ -25,10 +25,10 @@
 ## Who this is for
 
 **🛠  Building for a client, boss, or team lead**
-Send them the staging link. They click the bug icon, pick what's broken, speak or type what they want. You paste into your AI agent. Fix ships the same day.
+Send them the staging link. They select the affected element and type or speak a description. Copy the structured report to your agent, then verify and record the fix.
 
 **🚀  Running a product with real users**
-Users click the bug icon from inside your app. Reports arrive with full context (URL, selector, stack trace, voice transcript). Paste → AI fixes → user gets notified. No more "can you repro?" back-and-forth.
+Reports can include the URL, selector, stack trace and voice transcript. Choose a recipe for storage/delivery and connect its status and notification flow to your application.
 
 ---
 
@@ -47,7 +47,7 @@ Three commands. Paste each one separately and wait for it to finish before the n
 **2.** Install the plugin:
 
 ```
-/plugin install bugkit@bglglzd-bugkit
+/plugin install bugkit@bugkit
 ```
 
 **3.** Start the installer in your project:
@@ -68,7 +68,9 @@ Install bugkit in this project from https://raw.githubusercontent.com/bglglzd/bu
 
 Either path detects your stack, asks **one** question (where should bug reports go — DB, GitHub Issues, Telegram, JSONL, email, Slack, Discord), and implements the matching [recipe](./recipes/). Voice transcription is offered too — 🎤 mic button next to the description field, Web Speech API by default, local Whisper as an offline upgrade, never paid APIs.
 
-Full install takes about 5–10 minutes for a web app.
+This repository ships a specification, plugin prompts and integration recipes.
+The installer adapts them to your project; it is not a hosted reporting service.
+Verify the generated integration using that project's actual UI or CLI.
 
 ---
 
@@ -77,9 +79,9 @@ Full install takes about 5–10 minutes for a web app.
 | Traditional feedback form | bugkit |
 |---|---|
 | "Something is broken" | Selector, XPath, HTML, viewport, stack trace, voice transcript |
-| Fix takes days | Fix ships in minutes |
+| Rebuild context in every conversation | Copy one predictable context block |
 | Format differs per project | Standardized spec — same ritual across every project |
-| No closed-loop status | Reporter notified at each state change |
+| No defined status flow | Status lifecycle and notification recipes |
 | Typing long descriptions is a chore | 🎤 press-to-speak, auto-transcribed |
 
 ---
@@ -90,6 +92,20 @@ Full install takes about 5–10 minutes for a web app.
 - **[recipes/](./recipes/)** — 7 sink adapters (DB, GitHub Issues, Telegram, JSONL, email, Slack, Discord, CLI)
 - **[INSTALL.md](./INSTALL.md)** — the universal paste-in prompt for non-Claude-Code agents
 - **[Landing page](https://bglglzd.github.io/bugkit)** — one-page tour with copy-ready install commands
+
+## Verify the recipes
+
+With Node.js 24 LTS, no package installation is required:
+
+```bash
+node --test tests/*.test.mjs
+```
+
+The checks execute documented snippets with real temporary JSONL files and
+loopback HTTP services. Browser speech, provider SDKs and report stores used by
+adapter tests are explicit synthetic fixtures. Tests do not contact Telegram,
+Slack, Discord, email, GitHub Issues or a paid AI service. See
+[validation boundaries](./VALIDATION.md) and [contributing](./CONTRIBUTING.md).
 
 ---
 

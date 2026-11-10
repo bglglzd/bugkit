@@ -60,13 +60,15 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 export async function sendBugByEmail(report: BugReport) {
   const aiContext = buildAIContext(report)     // SPEC.md §3 template
 
-  await resend.emails.send({
+  const { data, error } = await resend.emails.send({
     from: process.env.BUGKIT_EMAIL_FROM!,
     to: process.env.BUGKIT_EMAIL_TO!,
     subject: `[${report.type.toUpperCase()} #${report.id}] ${report.title}`,
     html: renderHtml(report, aiContext),
     text: renderPlainText(report, aiContext),  // fallback
   })
+  if (error || !data?.id) throw new Error('Email provider rejected delivery or returned no receipt')
+  return data
 }
 ```
 

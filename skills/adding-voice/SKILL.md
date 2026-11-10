@@ -40,17 +40,17 @@ function attachVoice(textarea: HTMLTextAreaElement, micButton: HTMLButtonElement
   let baseText = ''
 
   recognition.onresult = (e: any) => {
-    let interim = ''
-    let finalText = ''
-    for (let i = e.resultIndex; i < e.results.length; i++) {
-      const t = e.results[i][0].transcript
-      if (e.results[i].isFinal) finalText += t
-      else interim += t
-    }
-    textarea.value = (baseText + finalText + interim).trimStart()
+    const speech = Array.from(e.results, (result: any) => result[0].transcript.trim()).filter(Boolean).join(' ')
+    textarea.value = (baseText + speech).trimStart()
+    textarea.dispatchEvent(new Event('input', { bubbles: true }))
   }
   recognition.onerror = () => { stopRecording() }
-  recognition.onend = () => { if (recording) recognition.start() /* keep alive */ }
+  recognition.onend = () => {
+    if (recording) {
+      baseText = textarea.value ? textarea.value + ' ' : ''
+      try { recognition.start() } catch { stopRecording() }
+    }
+  }
 
   function startRecording() {
     baseText = textarea.value ? textarea.value + ' ' : ''
