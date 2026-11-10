@@ -139,7 +139,7 @@ import { listReports, createBugReport, updateReport, buildAIContext } from './li
 
 const [,, cmd, ...args] = process.argv
 
-async function findReport(id: string | undefined) {
+async function findReport(id) {
   const reports = await listReports()
   const report = reports.find(report => String(report.id) === id)
   if (!report) { console.error('Not found'); process.exit(1) }

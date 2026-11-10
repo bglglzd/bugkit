@@ -13,7 +13,9 @@ function snippet(heading) {
   const section = recipe.split(`## ${heading}`)[1]?.split(/\r?\n## /)[0]
   const code = section?.match(/```ts\r?\n([\s\S]*?)```/)?.[1]
   assert.ok(code, `Missing TypeScript example: ${heading}`)
-  return stripTypeScriptTypes(code, {mode: 'strip'})
+  // The documented CLI is saved as .js and run directly with Node. Do not
+  // silently transpile it: TypeScript syntax there would break installation.
+  return heading === 'Minimal CLI implementation' ? code : stripTypeScriptTypes(code, {mode: 'strip'})
 }
 
 async function fixture(run) {
