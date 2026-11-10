@@ -90,14 +90,19 @@ test('GitHub CLI uses direct argv/body-file stdin, preserves literal title and p
     child.stdin.end = value => { body = value; queueMicrotask(() => child.emit('close', code)) }
     return child
   }
-  const {createGhIssue} = load(await snippet('recipes/cli-tool.md', '## Publishing via GitHub Issues instead'), ['createGhIssue'], {spawn, buildAIContext: () => 'Synthetic complete context'})
+  const {buildAIContext} = load(await snippet('recipes/web-app-full.md', '## The "Copy Context for AI" function'), ['buildAIContext'])
+  const {createGhIssue} = load(await snippet('recipes/cli-tool.md', '## Publishing via GitHub Issues instead'), ['createGhIssue'], {spawn, buildAIContext})
   const title = 'Synthetic $(literal) `title` "quoted"'
-  await createGhIssue({...report, title})
+  const hint = 'gh issue close "<created-issue-URL>" --comment "<short note>"'
+  await assert.rejects(createGhIssue(report), /update hint is required/)
+  assert.equal(captured, undefined)
+  await createGhIssue({...report, title}, hint)
   assert.equal(captured.command, 'gh'); assert.equal(captured.options.shell, false)
   assert.equal(captured.args[captured.args.indexOf('--title') + 1], title)
   assert.equal(captured.args[captured.args.indexOf('--body-file') + 1], '-')
-  assert.equal(body, 'Synthetic complete context')
-  await createGhIssue({...report, type: 'feature'})
+  assert.equal(body, buildAIContext({...report, title}, hint))
+  assert.ok(!body.includes('PATCH /api/bug-reports/'))
+  await createGhIssue({...report, type: 'feature'}, hint)
   assert.equal(captured.args[captured.args.indexOf('--label') + 1], 'bugkit,feature')
-  code = 1; await assert.rejects(createGhIssue(report), /failed/)
+  code = 1; await assert.rejects(createGhIssue(report, hint), /failed/)
 })

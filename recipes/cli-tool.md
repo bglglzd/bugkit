@@ -141,8 +141,9 @@ If your CLI is open-source and you want reports to go to GitHub:
 - Requires `gh` CLI installed; fall back to JSONL if not
 
 ```ts
-async function createGhIssue(report: BugReport) {
-  const body = buildAIContext(report)
+async function createGhIssue(report: BugReport, updateHint: string) {
+  if (!updateHint?.trim()) throw new Error('A storage-specific update hint is required')
+  const body = buildAIContext(report, updateHint)
   const child = spawn('gh', ['issue', 'create', '--title', report.title, '--body-file', '-', '--label', `bugkit,${report.type}`], {
     shell: false, stdio: ['pipe', 'inherit', 'inherit'],
   })
@@ -156,6 +157,10 @@ async function createGhIssue(report: BugReport) {
 ```
 
 Fall back to JSONL if `gh` isn't available so users without it still get a working local log.
+Pass an explicit hint: for an issue-only store, use
+`gh issue close "<created-issue-URL>" --comment "<short note>"`; for a JSONL
+source of truth, use its actual local close command. A CLI must not inherit the
+web reference's PATCH endpoint.
 
 ---
 

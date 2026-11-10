@@ -101,8 +101,9 @@ function splitText(text: string, limit = 2800): string[] {
   return chunks
 }
 
-export async function postToChat(report: BugReport) {
-  const aiContext = buildAIContext(report)   // SPEC.md §3
+export async function postToChat(report: BugReport, updateHint: string) {
+  if (!updateHint?.trim()) throw new Error('A storage-specific update hint is required')
+  const aiContext = buildAIContext(report, updateHint)   // SPEC.md §3
   if (!process.env.BUGKIT_SLACK_WEBHOOK && !process.env.BUGKIT_DISCORD_WEBHOOK) throw new Error('No chat destination configured')
 
   if (process.env.BUGKIT_SLACK_WEBHOOK) {
@@ -137,7 +138,10 @@ export async function postToChat(report: BugReport) {
 ```
 
 Use Node 24 LTS built-in fetch/FormData/Blob. The report store remains the source of
-truth. Propagate delivery errors and expose partial delivery separately from a
+truth. Pass its actual update command, for example
+`postToChat(report, 'node scripts/bugkit.js close ' + report.id + ' "<note>"')`
+for JSONL. For chat-only reports, pass an explicit instruction to record the
+resolution in the report's thread. Propagate delivery errors and expose partial delivery separately from a
 stored report; retrying after a partially accepted multi-message delivery can
 duplicate notifications. Configure request-size/rate limits for your application.
 See [Slack text limits](https://docs.slack.dev/reference/block-kit/composition-objects/text-object/)
