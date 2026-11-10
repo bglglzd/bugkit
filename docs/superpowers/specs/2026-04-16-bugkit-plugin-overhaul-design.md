@@ -1,7 +1,7 @@
 # bugkit v1.0 — Plugin Overhaul Design
 
 **Date:** 2026-04-16
-**Author:** bglglzd (with Claude)
+**AI assistance:** Claude
 **Status:** Approved for implementation
 
 ## Goal

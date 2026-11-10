@@ -36,7 +36,7 @@ Write `.claude-plugin/plugin.json`:
   "description": "AI-friendly bug reports for any project. Users click, AI fixes, done.",
   "version": "1.0.0",
   "author": {
-    "name": "bglglzd"
+    "name": "bugkit"
   },
   "repository": "https://github.com/bglglzd/bugkit",
   "homepage": "https://bglglzd.github.io/bugkit"
@@ -51,7 +51,7 @@ Write `.claude-plugin/marketplace.json`:
 {
   "name": "bugkit",
   "owner": {
-    "name": "bglglzd"
+    "name": "bugkit"
   },
   "plugins": [
     {

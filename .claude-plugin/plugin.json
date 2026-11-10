@@ -3,7 +3,7 @@
   "description": "AI-friendly bug reports for any project. Users click, AI fixes, done.",
   "version": "1.0.0",
   "author": {
-    "name": "bglglzd"
+    "name": "bugkit"
   },
   "repository": "https://github.com/bglglzd/bugkit",
   "homepage": "https://bglglzd.github.io/bugkit"
