@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="bugkit — Users click. AI fixes. Done.">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0d0d12"/>
+      <stop offset="100%" stop-color="#1a1024"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff4a6e"/>
+      <stop offset="100%" stop-color="#ff7b3a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <g transform="translate(100, 200)">
+    <rect width="160" height="160" rx="32" fill="url(#accent)"/>
+    <g transform="translate(80, 80) scale(1.2) translate(-60, -60)" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <ellipse cx="60" cy="64" rx="22" ry="26" fill="#fff" stroke="none"/>
+      <line x1="60" y1="38" x2="60" y2="90"/>
+      <path d="M48 34 L40 24" />
+      <path d="M72 34 L80 24" />
+      <path d="M38 54 L24 48" />
+      <path d="M38 64 L22 64" />
+      <path d="M38 74 L24 82" />
+      <path d="M82 54 L96 48" />
+      <path d="M82 64 L98 64" />
+      <path d="M82 74 L96 82" />
+    </g>
+  </g>
+
+  <text x="300" y="250" fill="#fff" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="96">bugkit</text>
+  <text x="300" y="320" fill="url(#accent)" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="52">Users click. AI fixes. Done.</text>
+  <text x="300" y="380" fill="#aaa" font-family="system-ui, -apple-system, sans-serif" font-weight="400" font-size="28">AI-friendly bug reports for any project.</text>
+
+  <g transform="translate(100, 500)">
+    <rect width="1000" height="80" rx="12" fill="#ffffff0a" stroke="#ffffff22"/>
+    <text x="30" y="50" fill="#d0d0d8" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="26">
+      /plugin marketplace add bglglzd/bugkit  ·  /plugin install  ·  /bugkit:install
+    </text>
+  </g>
+</svg>
