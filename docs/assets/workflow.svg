@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" role="img" aria-labelledby="title desc">
+  <title id="title">Illustrated bugkit workflow</title>
+  <desc id="desc">Report a problem, collect its context, give the report to a coding agent, and verify the fix. This is a diagram, not a recorded demonstration.</desc>
+  <rect width="1000" height="300" rx="24" fill="#101014"/>
+  <g font-family="system-ui, sans-serif" text-anchor="middle">
+    <text x="500" y="49" fill="#fafafa" font-size="27" font-weight="700">A report your coding agent can use</text>
+    <g fill="#1d1d25" stroke="#464653">
+      <rect x="30" y="93" width="210" height="124" rx="16"/>
+      <rect x="273" y="93" width="210" height="124" rx="16"/>
+      <rect x="516" y="93" width="210" height="124" rx="16"/>
+      <rect x="759" y="93" width="210" height="124" rx="16"/>
+    </g>
+    <g fill="#ff6867" font-size="17" font-weight="700">
+      <text x="135" y="126">1. REPORT</text><text x="378" y="126">2. CONTEXT</text>
+      <text x="621" y="126">3. HANDOFF</text><text x="864" y="126">4. VERIFY</text>
+    </g>
+    <g fill="#eeeef4" font-size="18">
+      <text x="135" y="164">Point to the problem</text><text x="378" y="164">URL, selector, details</text>
+      <text x="621" y="164">Paste into your agent</text><text x="864" y="164">Check the result</text>
+    </g>
+    <g fill="#b7b7c5" font-size="25"><text x="257" y="165">→</text><text x="500" y="165">→</text><text x="742" y="165">→</text></g>
+    <text x="500" y="265" fill="#b7b7c5" font-size="16">Workflow illustration. Integration and validation happen in your project.</text>
+  </g>
+</svg>
