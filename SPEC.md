@@ -42,7 +42,7 @@ Everything below is **optional** — capture what your platform can provide.
     "locale": "en-US"
   },
   "page": {                       // web / webview only
-    "url": "https://example.com/path?x=1",
+    "url": "https://example.com/path",
     "route": "users/[id]/settings",
     "referrer": "..."
   },
@@ -187,7 +187,7 @@ Mandatory:
 1. Create a report with at least `{type, title, description, reporter, created_at}`
 2. Capture as much optional context as the platform can provide
 3. Status lifecycle as defined
-4. A way for admins to produce the **exact** AI context format above
+4. A way for admins to produce the compatible section order above, with untrusted report data enclosed in nonce-delimited boundaries and instructions outside
 5. A way to update status + resolution
 
 Recommended:
@@ -196,7 +196,7 @@ Recommended:
 - Link resolution to a commit SHA when possible
 - Rate-limit submissions per user
 
-Out of scope for this spec (do it however you want):
+Host-specific implementation choices (must satisfy [HARDENING.md](HARDENING.md) for an application integration):
 - Authentication model
 - Permissions
 - Admin UI framework
@@ -210,3 +210,15 @@ Out of scope for this spec (do it however you want):
 This is **Spec v1**. Breaking changes will bump to v2 and be announced in the repo. Additive changes (new optional fields) stay on v1.
 
 Implementations should emit `bugkit_spec: "1"` somewhere in stored reports so future tools can tell what format to expect.
+
+## 6. Additive reliability fields (v1.1)
+
+`bugkit_spec: "1"` and the existing required fields/statuses stay unchanged. Optional fields include `kind` (configurable category), `occurred_at`, `exported_at`, `reproduction` (`steps`, `expected`, `actual`), `environment.build_id`, `environment.version_source`, `environment.extension_version`, `elements` (additional selected elements), `user_note`, `resolved_release`, `original_title`, `original_description`, `edited_at` and `edited_by`. A client-observed `reporter.role` conveys no authority. Server integrations derive identity, tenant, role and release from their own authenticated state.
+
+### Context framing
+
+The section order in §3 is retained. Enclose report headers and populated data sections in `<<<BEGIN USER-DATA {nonce}>>>` and `<<<END USER-DATA {nonce}>>>`, using a fresh cryptographically random nonce absent from the content. The trusted `## Instructions` and configured update hint follow the closing marker. Normalize header values to one line. Optional `Occurred`, `Exported`, reproduction, revision and AI-conversation sections are additive. Consumers must not treat arbitrary report text as executable instructions.
+
+Copy Context and CLI share their formatter and default application masking policy. A text-only export omits automatic environment/page/DOM/error/log/attachment content. Preview the processed result and disclose masking limits. MARK uses its standalone local format and has no trusted reporter role or server closure operation.
+
+Application acceptance, including original preservation, drafts, scoped access, atomic closure and notification retry, is defined in [HARDENING.md](HARDENING.md). A v1 field marker does not prove that a host has passed those checks.

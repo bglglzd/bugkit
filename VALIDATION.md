@@ -1,41 +1,21 @@
 # Validation boundaries
 
-bugkit contains a portable report specification, plugin commands/skills and
-recipes that an installing agent adapts to a project. It has no runtime package
-manifest or hosted delivery service. Recipe-specific SDKs belong to the target
-project; keep them on supported versions there.
+BugKit includes a local Chrome extension, specification, plugin installer and application recipes. It has no hosted delivery service. Node.js 24+ runs the dependency-free checks; Playwright is a pinned development-only dependency for real Chromium acceptance. Python 3.11+ packages committed files.
 
-Run `node --test tests/*.test.mjs` with Node 24 LTS. CI runs the same checks on
-Linux and Windows. Tests extract the actual documented code blocks, rather than
-keeping a separate implementation of each adapter.
+```sh
+npm run check
+npm test
+npm ci
+npx playwright install chromium
+npm run test:browser
+```
 
-The suite exercises:
+CI runs syntax and contract checks on Linux and Windows, plus real extension acceptance in Chromium. Browser tests use a disposable profile, loopback synthetic demo and DevTools' extension action. They exercise actual injection, element selection, clipboard, downloads, captureVisibleTab, draft reload, SPA route isolation, narrow layout and restricted-page help. Pixel comparison checks that the capture excludes the panel. The clipboard-read permission granted by the harness is for checking exported text; MARK itself requests only clipboardWrite.
 
-- Registered marketplace/install-command consistency and the advertised voice
-  command asset.
-- Canonical SPEC context fields, section order and storage-specific close hints.
-- Actual temporary JSONL create/list/show/copy/close, full UUID/numeric selection,
-  failure visibility and terminal resolution validation.
-- Telegram complete IDs, webhook secret and chat/user authorization, reason
-  replies, large context files and delivery failures using loopback HTTP.
-- Slack chunk reconstruction and Discord file delivery with long Unicode text,
-  controlled mentions, acknowledgement requests and rejected deliveries.
-- Resend's resolved-promise error contract and GitHub issue-body reconstruction
-  with explicit fake SDKs. No actual email or issue is created.
-- Literal CLI argv/stdin, synthetic speech-result sequences/restarts, and picker
-  coordinates with synthetic scrolled HTML/SVG browser objects.
-- Both Whisper proxy snippets' input validation, multipart byte forwarding and
-  upstream HTTP rejection using a synthetic loopback endpoint. Setup commands
-  are checked against the linked upstream source; no actual Whisper server or
-  model is executed by this suite.
+Results and screenshots are written to ignored `artifacts/browser/`. There is no connection to an existing browser or personal profile. The DevTools action verifies the toolbar action path, not physical shortcut key dispatch. Native Chrome installation and macOS keyboard/system behavior remain manual checks.
 
-These checks establish the supplied examples' contracts. They do not establish
-live provider credentials, a generated project's framework integration, real
-microphone recognition, email deliverability, rate-limit behavior or AI fix
-quality. Plugin validation/clean local installation can be performed without an
-inference request using an isolated Claude Code configuration directory.
+Contract tests execute documented recipe snippets with real temporary JSONL files and loopback HTTP. Provider SDKs, browser speech objects and some picker objects are explicitly synthetic. No real Telegram/Slack/Discord/email message or GitHub issue is created. Tests cover delivery rejection, complete IDs, safe argv, large Unicode payloads, required close hints, context masking/framing, malformed optional blocks and text-only export. Whisper proxy tests use a synthetic upstream; no model/server is run.
 
-Store a report before mirroring it. Delivery errors must remain distinguishable
-from a saved report; retrying a partially accepted multi-message operation may
-duplicate a notification. Telegram pending-reason storage in the example is for
-a single process; use durable storage for multiple workers/serverless handlers.
+These tests establish supplied code/example behavior. They do not establish a generated application's framework integration, authorization, database transaction behavior, live provider credentials, microphone recognition, email deliverability or AI fix quality. The installer must perform the host-specific [acceptance checklist](HARDENING.md).
+
+To verify an artifact, build with `python scripts/package.py` from a clean committed checkout, extract its ZIP, and rerun browser acceptance with `BUGKIT_EXTENSION_DIR` pointing to the extracted `extension/`. Compare the release download's digest against `SHA256SUMS.txt` and the source-bound `build-manifest.json`. A rebuilt ZIP is a new artifact until its bytes and relevant checks are verified.

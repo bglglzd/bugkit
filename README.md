@@ -1,112 +1,75 @@
-<div align="center">
+<img src="assets/bugkit-logo.png" width="88" height="88" alt="BugKit logo">
 
-<img src="./assets/logo.svg" alt="bugkit" width="120" />
+# BugKit
 
-# bugkit
+Capture bug reports in Chrome, or add reporting to your application. Reports include a description, page context and selected elements, with Markdown for a developer or coding agent.
 
-**Bug reports with context your coding agent can use.**
+[Download Chrome extension](https://github.com/bglglzd/bugkit/releases/latest) · [Installation](INSTALL.md) · [Русская инструкция](docs/INSTALL.ru.md) · [Demo and documentation](https://bglglzd.github.io/bugkit/)
 
-*Capture the page, selected element and errors with a report. Give the structured context to your coding agent, verify its patch, and record the resolution.*
+![BugKit MARK running on the included synthetic demo](assets/extension-preview.png)
 
-<img src="./assets/workflow.svg" alt="Illustrated workflow: report a problem, collect context, hand it to an agent, verify the fix" width="900" />
+## Chrome extension: BugKit MARK
 
-*Workflow illustration; integration and validation happen in your project.*
+1. Download **BugKit-MARK-1.1.0.zip** from [Releases](https://github.com/bglglzd/bugkit/releases/latest) and extract it to a permanent folder.
+2. Open `chrome://extensions`, enable **Developer mode**, choose **Load unpacked** and select the extracted **extension** folder containing `manifest.json`.
+3. Open a website. Click the BugKit MARK toolbar icon, or press **Ctrl+Shift+Y** (**⌘+Shift+Y** on macOS).
+4. Select an element, describe the problem and review the report. Copy Markdown or save `.md`, `.json` and an optional screenshot.
 
-<br><br>
+No Git, Node.js, account, API key or build is needed. The interface is currently in Russian. Change the shortcut at `chrome://extensions/shortcuts`. Keep the extracted folder: Chrome loads the extension from there. To update, replace its contents, click **Reload** on the extension card and reload the website tab. GitHub ZIP installations do not update automatically. There is no Chrome Web Store listing.
 
-[![star on github](https://img.shields.io/github/stars/bglglzd/bugkit?style=social)](https://github.com/bglglzd/bugkit)
-[![spec v1](https://img.shields.io/badge/spec-v1-blue)](./SPEC.md)
-[![license MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+The panel is injected only when invoked. Reports stay local until copied or exported. Session drafts retain text and selected elements across page reloads; screenshots must be added again after a reload. Drafts disappear when the tab or browser session closes. The extension cannot detect logout on arbitrary websites: clear its draft before sharing a browser session or changing accounts.
 
-</div>
+URL credentials, query parameters and fragments are removed from report context. Form values, full HTML, console history and network traffic are not collected. Selected visible text, URL paths and screenshots can still contain private information; review them before sharing. Screenshots require a separate action, cover the visible viewport and exclude the MARK panel.
 
----
+Chrome blocks injection on internal pages, its extension store and some viewers. Closed Shadow DOM and iframe contents are not inspected. File URLs require **Allow access to file URLs**. MARK does not send issues to a server or change their status. See [permissions and limitations](docs/EXTENSION.md).
 
-## Who this is for
+## Add BugKit to an application
 
-**🛠  Building for a client, boss, or team lead**
-Send them the staging link. They select the affected element and type or speak a description. Copy the structured report to your agent, then verify and record the fix.
+This path adds a form, storage, status management and notifications to an existing project. It uses a specification and agent instructions; it is not a prebuilt backend. [INSTALL.md](INSTALL.md) covers both paths.
 
-**🚀  Running a product with real users**
-Reports can include the URL, selector, stack trace and voice transcript. Choose a recipe for storage/delivery and connect its status and notification flow to your application.
+For Claude Code, run each command separately:
 
----
-
-## Install
-
-### Claude Code
-
-Three commands. Paste each one separately and wait for it to finish before the next.
-
-**1.** Add the bugkit marketplace:
-
-```
+```text
 /plugin marketplace add bglglzd/bugkit
-```
-
-**2.** Install the plugin:
-
-```
 /plugin install bugkit@bugkit
-```
-
-**3.** Start the installer in your project:
-
-```
 /bugkit:install
 ```
 
-### Any other AI agent
+For other agents, pass this instruction:
 
-Cursor, GitHub Copilot, ChatGPT, Gemini, Aider, Cline — paste this one line into the chat:
-
-```
-Install bugkit in this project from https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md
+```text
+Install BugKit in this project using https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md
 ```
 
----
+The installer reuses existing UI, authentication and storage, then implements the selected [recipe](recipes/). Both installer paths require [integration acceptance checks](HARDENING.md), including draft recovery, access checks, safe context export and separate technical/user resolution notes. Optional voice input belongs to application integrations; MARK has no microphone feature. Browser speech recognition may use the browser provider's service.
 
-Either path detects your stack, asks **one** question (where should bug reports go — DB, GitHub Issues, Telegram, JSONL, email, Slack, Discord), and implements the matching [recipe](./recipes/). Voice transcription is offered too — 🎤 mic button next to the description field, Web Speech API by default, local Whisper as an offline upgrade, never paid APIs.
+## Develop and verify
 
-This repository ships a specification, plugin prompts and integration recipes.
-The installer adapts them to your project; it is not a hosted reporting service.
-Verify the generated integration using that project's actual UI or CLI.
+Node.js **24 LTS or newer** is needed for development. The regular checks have no dependencies:
 
----
-
-## Why this beats a feedback form
-
-| Traditional feedback form | bugkit |
-|---|---|
-| "Something is broken" | Selector, XPath, HTML, viewport, stack trace, voice transcript |
-| Rebuild context in every conversation | Copy one predictable context block |
-| Format differs per project | Standardized spec — same ritual across every project |
-| No defined status flow | Status lifecycle and notification recipes |
-| Typing long descriptions is a chore | 🎤 press-to-speak, auto-transcribed |
-
----
-
-## Docs
-
-- **[SPEC.md](./SPEC.md)** — the portable data contract
-- **[recipes/](./recipes/)** — 7 sink adapters (DB, GitHub Issues, Telegram, JSONL, email, Slack, Discord, CLI)
-- **[INSTALL.md](./INSTALL.md)** — the universal paste-in prompt for non-Claude-Code agents
-- **[Landing page](https://bglglzd.github.io/bugkit)** — one-page tour with copy-ready install commands
-
-## Verify the recipes
-
-With Node.js 24 LTS, no package installation is required:
-
-```bash
-node --test tests/*.test.mjs
+```sh
+npm run check
+npm test
+npm run demo
 ```
 
-The checks execute documented snippets with real temporary JSONL files and
-loopback HTTP services. Browser speech, provider SDKs and report stores used by
-adapter tests are explicit synthetic fixtures. Tests do not contact Telegram,
-Slack, Discord, email, GitHub Issues or a paid AI service. See
-[validation boundaries](./VALIDATION.md) and [contributing](./CONTRIBUTING.md).
+The synthetic demo listens on `http://127.0.0.1:4173`. Stop it with Ctrl+C. Browser acceptance uses a pinned development dependency and Chromium:
 
----
+```sh
+npm ci
+npx playwright install chromium
+npm run test:browser
+```
 
-MIT — use it anywhere. ⭐ Star or watch this repo for new releases.
+Browser checks use a disposable profile and real extension APIs. They do not operate an existing browser. [Validation boundaries](VALIDATION.md) distinguish automated checks from manual Windows/macOS verification and provider fixtures.
+
+To build the release ZIP, install Python **3.11+** and run `python scripts/package.py` from a clean committed checkout. Its manifest binds the source commit and SHA256 of packaged files; local data, dependencies and private evidence are excluded.
+
+## Reference
+
+- [SPEC.md](SPEC.md): portable v1 report fields and context format, with additive reliability fields.
+- [HARDENING.md](HARDENING.md): required behavior for application integrations.
+- [recipes/](recipes/): database, GitHub Issues, Telegram, JSONL, email, Slack/Discord and CLI examples.
+- [Contributing](CONTRIBUTING.md), [changelog](CHANGELOG.md), [security](SECURITY.md) and [MIT license](LICENSE).
+
+BugKit MARK was contributed as a standalone local extension and integrated here with its name retained. Application-specific code and internal deployment instructions are not part of this repository.

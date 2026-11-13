@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="app-version" content="2.4.1">
+  <meta name="build-id" content="demo-20261113">
+  <title>Studio — тестовая страница MARK</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="demo.js"></script>
+</head>
+<body>
+  <header><a class="wordmark" href="#top">studio<span> / </span>workspace</a><span class="version">Демо 2.4.1</span></header>
+  <main id="top">
+    <div class="intro"><p class="eyebrow">Синтетические данные</p><h1>Проверка расширения</h1><p>Откройте MARK через значок расширения или горячую клавишу. Выберите кнопку, ссылку или элемент списка и составьте первый отчёт.</p></div>
+    <section aria-labelledby="projects-title">
+      <div class="section-heading"><h2 id="projects-title">Проекты</h2><button id="create-project" type="button">Создать проект</button></div>
+      <div class="project-row"><span class="project-icon">A</span><div><h3>Atlas</h3><p>Сайт команды · Дизайн и разработка</p></div><span class="status">На проверке</span><a id="project-link" href="#details">Открыть →</a></div>
+      <div class="project-row"><span class="project-icon green">N</span><div><h3>North</h3><p>Личный кабинет · Новая навигация</p></div><span class="status quiet">В работе</span><button class="text-button" type="button" data-action="review">Проверить →</button></div>
+      <p id="action-result" role="status">Нажмите кнопку, чтобы проверить обычный клик. При выборе через MARK действие не должно выполняться.</p>
+    </section>
+    <section id="details" aria-labelledby="details-title">
+      <h2 id="details-title">Детали проверки</h2>
+      <div class="two-columns"><div><label for="test-name">Тестовое имя</label><input id="test-name" name="name" value="Пример пользователя"><label for="test-password">Тестовый пароль</label><input id="test-password" name="password" type="password" value="synthetic-demo-only"><p class="hint">Значения полей не должны автоматически попадать в отчёт.</p></div><div><h3>Разные элементы</h3><p>Повторяющиеся ID специально добавлены для проверки селекторов.</p><div class="repeat"><button id="duplicate" type="button">Первый</button><button id="duplicate" type="button">Второй</button></div><div id="shadow-example"></div></div></div>
+    </section>
+    <section class="long-section"><h2>Проверка после прокрутки</h2><p>Прокрутите страницу и выберите нижнюю кнопку. Координаты подсветки должны совпадать с элементом.</p><button id="bottom-button" type="button">Нижняя кнопка</button></section>
+  </main>
+  <footer>Локальная демо-страница MARK. Ничего не отправляется на сервер.</footer>
+</body>
+</html>

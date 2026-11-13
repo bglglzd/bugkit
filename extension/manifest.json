@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "BugKit MARK — контекст ошибок",
+  "short_name": "MARK",
+  "version": "1.1.0",
+  "description": "Выберите элемент, опишите проблему и сохраните отчёт локально. Панель появляется только по вашему вызову.",
+  "minimum_chrome_version": "112",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "clipboardWrite"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/mark.png"
+      ],
+      "matches": [
+        "<all_urls>"
+      ],
+      "use_dynamic_url": true
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "MARK — открыть или закрыть панель",
+    "default_icon": {
+      "16": "icons/mark-16.png",
+      "32": "icons/mark-32.png",
+      "48": "icons/mark-48.png",
+      "128": "icons/mark-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/mark-16.png",
+    "32": "icons/mark-32.png",
+    "48": "icons/mark-48.png",
+    "128": "icons/mark-128.png"
+  },
+  "commands": {
+    "toggle-panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Открыть или закрыть MARK на текущей странице"
+    }
+  },
+  "homepage_url": "https://github.com/bglglzd/bugkit"
+}

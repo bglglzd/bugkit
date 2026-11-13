@@ -1,0 +1,16 @@
+{
+  "name": "bugkit",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Local Chrome bug reports and application integration recipes.",
+  "license": "MIT",
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node scripts/test.mjs",
+    "demo": "node scripts/serve-demo.mjs",
+    "test:browser": "node scripts/browser-test.mjs",
+    "test:docs": "node scripts/docs-check.mjs"
+  },
+  "devDependencies": {"playwright": "1.65.0"}
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MARK — открыть панель</title>
+  <link rel="icon" href="icons/mark.png">
+  <link rel="stylesheet" href="help.css">
+  <script src="help.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><img src="icons/mark.png" width="40" height="40" alt=""><span>BugKit MARK</span></header>
+    <p class="eyebrow">СПРАВКА РАСШИРЕНИЯ</p>
+    <h1>Откройте страницу сайта</h1>
+    <p id="reason">На этой странице Chrome не разрешает выбор элементов. Перейдите на обычный сайт и вызовите MARK ещё раз.</p>
+    <div class="shortcut"><span>Открыть или закрыть панель</span><kbd id="shortcut">Через иконку MARK</kbd></div>
+    <p>Панель появляется по сочетанию клавиш или нажатию иконки расширения. Закрыть её можно повторным вызовом, крестиком или клавишей <kbd>Esc</kbd>.</p>
+    <button id="configure" type="button">Настроить сочетание клавиш <span aria-hidden="true">↗</span></button>
+    <details>
+      <summary>Почему панель не открывается?</summary>
+      <ul>
+        <li>Chrome блокирует внедрение панели на служебных страницах, в магазине расширений и на некоторых других защищённых страницах.</li>
+        <li>Для локального HTML откройте настройки MARK на странице расширений и включите «Разрешить открывать локальные файлы».</li>
+        <li>После обновления MARK перезагрузите страницу сайта и вызовите панель снова.</li>
+        <li>Если сочетание занято системой или другим расширением, назначьте своё. Иконка MARK остаётся доступной.</li>
+      </ul>
+    </details>
+    <footer>Отчёты сохраняются вами в файлы. Черновики живут только в текущем сеансе браузера.</footer>
+  </main>
+</body>
+</html>

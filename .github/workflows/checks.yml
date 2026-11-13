@@ -1,4 +1,4 @@
-name: Recipe checks
+name: BugKit checks
 on:
   push:
     branches: [main]
@@ -19,7 +19,25 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-      - name: Execute recipe contracts without external delivery
-        run: node --test tests/*.test.mjs
+      - name: Check source and manifest
+        run: npm run check
+      - name: Execute extension and recipe contracts without external delivery
+        run: npm test
       - name: Verify patch whitespace
         run: git diff --check
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Exercise the real extension
+        run: npm run test:browser
+      - name: Verify documentation and page controls
+        run: npm run test:docs
+      - name: Build source-bound Chrome ZIP
+        run: python scripts/package.py

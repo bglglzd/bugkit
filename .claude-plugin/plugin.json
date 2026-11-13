@@ -1,7 +1,7 @@
 {
   "name": "bugkit",
-  "description": "AI-friendly bug reports for any project. Users click, AI fixes, done.",
-  "version": "1.0.0",
+  "description": "Bug report forms, context export and integration acceptance checks.",
+  "version": "1.1.0",
   "author": {
     "name": "bugkit"
   },

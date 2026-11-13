@@ -1,0 +1,28 @@
+BugKit MARK 1.1.0 — Chrome extension
+
+1. Keep this extracted folder in a permanent location.
+2. Open chrome://extensions and enable Developer mode.
+3. Choose Load unpacked and select the extension folder next to this file.
+4. Open a website and click the toolbar icon, or Ctrl+Shift+Y (macOS: Command+Shift+Y).
+5. Select an element, describe the issue, review and copy/save the report.
+
+No Node.js, Git, account or API keys are needed. The interface is Russian.
+Change shortcuts at chrome://extensions/shortcuts.
+To update, close MARK, replace files in the same folder, Reload the extension,
+and reload the website. Unpacked installations do not update automatically.
+
+Русский:
+Распакуйте ZIP в постоянную папку. Откройте chrome://extensions, включите
+«Режим разработчика», нажмите «Загрузить распакованное» и выберите extension.
+На сайте нажмите значок BugKit MARK или Ctrl+Shift+Y (macOS: Command+Shift+Y).
+Отметьте элемент, опишите проблему и проверьте текст перед передачей.
+Для обновления замените файлы, обновите расширение и перезагрузите вкладку.
+
+Reports stay local until you copy/export them. Drafts last for the tab/browser
+session; screenshots are not restored after page reload. Clear drafts before
+switching website accounts. Visible text, URL paths and screenshots may contain
+private information. MARK does not collect form values, full HTML, console or
+network traffic. Internal Chrome pages and the extension store are restricted.
+
+Source, full instructions, limitations and MIT license:
+https://github.com/bglglzd/bugkit

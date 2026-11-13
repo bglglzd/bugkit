@@ -1,11 +1,5 @@
 ---
-description: Install bugkit — AI-friendly bug reporting — in this project.
+description: Install or upgrade BugKit reporting and verify the complete journey.
 ---
 
-The user wants to install bugkit in this project.
-
-Invoke the `installing-bugkit` skill and follow it exactly. It will detect the
-project's stack, ask one question (where reports should be stored), implement
-the matching recipe, offer optional voice transcription, and verify the result.
-
-Do not start writing code before invoking the skill — it handles the full flow.
+Invoke the `installing-bugkit` skill. It reads the shared INSTALL.md, SPEC.md and HARDENING.md contract, adapts the chosen recipe and verifies recovery and authorization. Preserve existing reports and working integration code.

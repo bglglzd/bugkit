@@ -1,221 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>bugkit — reports with context for coding agents</title>
-  <meta name="description" content="AI-friendly bug reports for any project. Users report bugs with full context. Paste into Claude Code / Cursor / Copilot. Verify the generated patch and record its resolution.">
-  <meta property="og:title" content="bugkit — reports with context for coding agents">
-  <meta property="og:description" content="AI-friendly bug reports for any project. Paste into any AI coding agent. Verify the generated patch and record its resolution.">
-  <meta property="og:image" content="https://bglglzd.github.io/bugkit/assets/og-image.svg">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BugKit — Chrome extension and reporting integrations</title>
+  <meta name="description" content="Install BugKit MARK for local Chrome bug reports, or integrate a report form, context export and status tracking into your application.">
+  <meta property="og:title" content="BugKit">
+  <meta property="og:description" content="Local Chrome bug reports and application integration recipes.">
+  <meta property="og:image" content="https://bglglzd.github.io/bugkit/assets/social-preview.png">
   <meta property="og:url" content="https://bglglzd.github.io/bugkit/">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="icon" type="image/png" href="assets/bugkit-logo.png">
   <link rel="stylesheet" href="style.css">
+  <script src="page.js" defer></script>
 </head>
 <body>
-<div class="wrap">
-
-  <section class="hero">
-    <img src="assets/logo.svg" alt="bugkit logo" class="logo">
-    <h1>bugkit</h1>
-    <div class="tagline">Reports with context for coding agents.</div>
-    <p class="subtitle">
-      AI-friendly bug reports for any project. Users report bugs with full context — URL, element selector, stack trace, viewport, voice transcript. Admins hit one button. Paste into Claude Code or any AI coding agent. Verify the generated patch and record its resolution.
-    </p>
-    <div class="badges">
-      <a href="https://github.com/bglglzd/bugkit"><img alt="stars" src="https://img.shields.io/github/stars/bglglzd/bugkit?style=social"></a>
-      <a href="https://github.com/bglglzd/bugkit/blob/main/SPEC.md"><img alt="spec v1" src="https://img.shields.io/badge/spec-v1-blue"></a>
-      <a href="https://github.com/bglglzd/bugkit/blob/main/LICENSE"><img alt="license MIT" src="https://img.shields.io/badge/license-MIT-green"></a>
-    </div>
-  </section>
-
-  <section class="hero-demo" aria-label="Illustrated workflow: report a problem, collect context, hand it to an agent, verify the fix.">
-    <div class="chrome">
-      <span class="dot r"></span>
-      <span class="dot y"></span>
-      <span class="dot g"></span>
-      <span class="url">bugkit workflow illustration</span>
-    </div>
-    <img src="assets/workflow.svg" alt="Illustrated bugkit workflow" loading="lazy" />
-    <div class="caption">Workflow illustration: report → context → agent → verify. Integration happens in your project.</div>
-  </section>
-
-  <h2>Who this is for</h2>
-  <div class="personas">
-    <div class="persona">
-      <h3>🛠  Building for a client or boss</h3>
-      <p>Send them the staging link. They click the bug icon, pick the broken element, speak or type what they want. You paste the output into your AI coding agent. Verify the generated patch against their report. No more "did they mean the header or the hero?"</p>
-    </div>
-    <div class="persona">
-      <h3>🚀  Running a product with users</h3>
-      <p>Users click the bug icon from inside your app. Reports arrive with full context — selector, stack trace, viewport, voice transcript. Copy context to your agent, verify its patch, and connect status notifications to your application.</p>
-    </div>
+  <div class="wrap">
+    <header class="topbar">
+      <a class="brand" href="./"><img src="assets/bugkit-logo.png" width="40" height="40" alt="">BugKit</a>
+      <nav aria-label="Main"><a href="#install">Install</a><a href="https://github.com/bglglzd/bugkit/blob/main/SPEC.md">Specification</a><a href="https://github.com/bglglzd/bugkit">GitHub ↗</a></nav>
+    </header>
+    <main>
+      <section class="overview" aria-labelledby="title">
+        <div class="section-label">CHROME EXTENSION · APPLICATION RECIPES</div>
+        <h1 id="title">Bug reports with page context</h1>
+        <p>Select an element, describe the problem and export a report. Use the local Chrome extension, or integrate reporting and status tracking into your application's existing stack.</p>
+        <div class="actions"><a class="button primary" href="https://github.com/bglglzd/bugkit/releases/latest">Download Chrome extension <span aria-hidden="true">↓</span></a><a class="button" href="#application">Integrate into an app</a></div>
+        <p class="note">Extension v1.1.0 · Russian interface · Manual ZIP installation · MIT</p>
+      </section>
+      <figure class="preview"><img src="assets/extension-preview.png" width="1365" height="900" alt="BugKit MARK on the included synthetic demo: selected element, description and export controls"><figcaption>Actual extension on synthetic demo data. Reports stay local until copied or exported.</figcaption></figure>
+      <section id="install" class="section" aria-labelledby="install-title">
+        <div class="section-heading"><h2 id="install-title">Install in Chrome</h2><a href="https://github.com/bglglzd/bugkit/blob/main/docs/INSTALL.ru.md" lang="ru">Инструкция на русском ↗</a></div>
+        <ol class="steps">
+          <li><strong>Extract the release ZIP</strong><p>Download <code>BugKit-MARK-1.1.0.zip</code> and keep its extracted folder in a permanent location.</p></li>
+          <li><strong>Load the extension folder</strong><p>Open <code>chrome://extensions</code>, enable Developer mode and choose Load unpacked. Select <code>extension</code>, which contains <code>manifest.json</code>.</p></li>
+          <li><strong>Open a website and invoke MARK</strong><p>Click its toolbar icon, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd> (macOS: <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>Y</kbd>). Select an element, add a description and review the export.</p></li>
+        </ol>
+        <p class="note">No Node.js, Git, account or API key is needed. Change shortcuts at <code>chrome://extensions/shortcuts</code>. To update, replace the files, reload the extension and reload the website tab. ZIP installs have no automatic updates.</p>
+        <div class="links"><a href="demo/">Open synthetic test page ↗</a><a href="https://github.com/bglglzd/bugkit/blob/main/docs/EXTENSION.md">Permissions and limits ↗</a></div>
+      </section>
+      <section id="application" class="section" aria-labelledby="app-title">
+        <h2 id="app-title">Integrate into an application</h2>
+        <p>The installer adapts reporting to your existing UI, authentication and store. It adds forms, context export and a closure path according to the chosen recipe. This is a code integration, not a hosted backend.</p>
+        <div class="install-grid">
+          <article><h3>Claude Code</h3><p>Run each command separately in the target project.</p><pre><code id="claude-commands">/plugin marketplace add bglglzd/bugkit
+/plugin install bugkit@bugkit
+/bugkit:install</code></pre><button data-copy="claude-commands" type="button">Copy commands</button></article>
+          <article><h3>Other coding agents</h3><p>Pass this task to the agent working in your project.</p><pre><code id="agent-command">Install BugKit in this project using https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md</code></pre><button data-copy="agent-command" type="button">Copy task</button></article>
+        </div>
+        <p id="copy-status" role="status" aria-live="polite"></p>
+        <p>Both installers require draft recovery, server-side authorization, masked context export and separate technical and author-facing resolution notes. Verify these paths in the host application. Existing reports and IDs must be preserved during upgrades.</p>
+        <div class="links"><a href="https://github.com/bglglzd/bugkit/blob/main/INSTALL.md">Installer contract ↗</a><a href="https://github.com/bglglzd/bugkit/blob/main/HARDENING.md">Acceptance checklist ↗</a><a href="https://github.com/bglglzd/bugkit/tree/main/recipes">Storage and delivery recipes ↗</a></div>
+      </section>
+      <section class="section scope" aria-labelledby="scope-title"><h2 id="scope-title">Scope and privacy</h2><div class="columns"><div><h3>Local extension</h3><p>Captures explicitly selected elements and optional visible screenshots. Exports Markdown, JSON and PNG. Draft text survives page reloads within the tab's browser session.</p><p>No automatic collection of form values, full HTML, console history or network traffic. It does not send reports to a server or fix bugs.</p></div><div><h3>Review before sharing</h3><p>URL queries, fragments and credentials are stripped. Paths, visible text, identifiers and screenshots may still disclose private data. Clear drafts when changing website accounts.</p><p>Internal Chrome pages and some viewers block extensions. Iframe contents and closed Shadow DOM are not inspected. Physical macOS setup and native keyboard dispatch need manual verification.</p></div></div></section>
+    </main>
+    <footer><span>BugKit · MIT</span><div><a href="https://github.com/bglglzd/bugkit/blob/main/CHANGELOG.md">Changelog</a><a href="https://github.com/bglglzd/bugkit/blob/main/VALIDATION.md">Validation</a><a href="https://github.com/bglglzd/bugkit/issues">Report an issue</a></div></footer>
   </div>
-
-  <h2>Install — pick your AI agent</h2>
-  <div class="install-tabs">
-    <div class="tab-buttons">
-      <button class="tab-button active" data-tab="claude">Claude Code</button>
-      <button class="tab-button" data-tab="cursor">Cursor</button>
-      <button class="tab-button" data-tab="copilot">Copilot</button>
-      <button class="tab-button" data-tab="chatgpt">ChatGPT / Codex</button>
-      <button class="tab-button" data-tab="other">Other</button>
-    </div>
-
-    <div class="tab-panel active" id="tab-claude">
-      <ol class="install-steps">
-        <li>
-          <span class="step-num">1</span>
-          <div class="step-content">
-            <div class="step-label">Add the marketplace</div>
-            <div class="step-row">
-              <pre class="step-cmd">/plugin marketplace add bglglzd/bugkit</pre>
-              <button class="step-copy-btn" data-copy-text="/plugin marketplace add bglglzd/bugkit">Copy</button>
-            </div>
-          </div>
-        </li>
-        <li>
-          <span class="step-num">2</span>
-          <div class="step-content">
-            <div class="step-label">Install the plugin</div>
-            <div class="step-row">
-              <pre class="step-cmd">/plugin install bugkit@bugkit</pre>
-              <button class="step-copy-btn" data-copy-text="/plugin install bugkit@bugkit">Copy</button>
-            </div>
-          </div>
-        </li>
-        <li>
-          <span class="step-num">3</span>
-          <div class="step-content">
-            <div class="step-label">Run the installer</div>
-            <div class="step-row">
-              <pre class="step-cmd">/bugkit:install</pre>
-              <button class="step-copy-btn" data-copy-text="/bugkit:install">Copy</button>
-            </div>
-          </div>
-        </li>
-      </ol>
-      <p class="install-note">Run each command one at a time — wait for it to finish before pasting the next.</p>
-    </div>
-    <div class="tab-panel" id="tab-cursor">
-      <pre id="code-cursor">Install bugkit in this project from
-https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md</pre>
-      <button class="copy-btn" data-copy="code-cursor">Copy</button>
-    </div>
-    <div class="tab-panel" id="tab-copilot">
-      <pre id="code-copilot">Install bugkit in this project from
-https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md</pre>
-      <button class="copy-btn" data-copy="code-copilot">Copy</button>
-    </div>
-    <div class="tab-panel" id="tab-chatgpt">
-      <pre id="code-chatgpt">Install bugkit in this project from
-https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md</pre>
-      <button class="copy-btn" data-copy="code-chatgpt">Copy</button>
-    </div>
-    <div class="tab-panel" id="tab-other">
-      <p style="margin:0;color:var(--fg-muted);">Paste the full contents of <a href="https://github.com/bglglzd/bugkit/blob/main/INSTALL.md">INSTALL.md</a> into your AI chat. Works with Gemini CLI, Aider, Cline, and anything else that accepts a prompt.</p>
-    </div>
-  </div>
-
-  <h2>How it works</h2>
-  <div class="how-it-works">User finds bug
-  ↓  clicks bug icon, picks the broken element, speaks or types
-Report saved with full context (URL, selector, stack trace, viewport, transcript)
-  ↓
-Admin opens report → clicks "Copy Context for AI"
-  ↓  standardized prompt with everything the AI needs
-Paste into Claude Code / Cursor / Copilot / ChatGPT
-  ↓
-AI fixes the bug, ships a commit
-  ↓
-Admin marks report "resolved" with a short note + commit SHA
-  ↓
-Application sends its configured status notification</div>
-
-  <h2>Why this beats a feedback form</h2>
-  <table>
-    <thead>
-      <tr><th>Traditional feedback form</th><th>bugkit</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>"Something is broken"</td><td>Selector, XPath, HTML, viewport, URL, stack trace, voice transcript</td></tr>
-      <tr><td>Admin reads, asks clarifying questions</td><td>Admin pastes to AI, AI already has everything</td></tr>
-      <tr><td>Rebuild context in each conversation</td><td>Copy one predictable context block</td></tr>
-      <tr><td>Format differs per project</td><td>Standardized spec — same ritual across all your projects</td></tr>
-      <tr><td>No defined status flow</td><td>Status lifecycle and notification recipes</td></tr>
-      <tr><td>Typing long descriptions is a chore</td><td>🎤 press-to-speak, auto-transcribed</td></tr>
-    </tbody>
-  </table>
-
-  <h2>Voice — free, no keys, works on slow computers</h2>
-  <p style="color:var(--fg-muted);">
-    🎤 Mic button next to the description field. Press, speak, transcript streams into the textarea live. Edit if you want, submit.
-  </p>
-  <p style="color:var(--fg-muted);">
-    Default is the browser's <strong>Web Speech API</strong> — free, no install, no keys. Optional upgrade is <strong>local Whisper</strong> (whisper.cpp) for offline / Firefox / full privacy — ~150MB one-time model download, CPU-only. Never paid APIs as the default path.
-  </p>
-
-  <h2>Docs</h2>
-  <ul style="color:var(--fg-muted);">
-    <li><a href="https://github.com/bglglzd/bugkit/blob/main/SPEC.md">SPEC.md</a> — the portable data contract</li>
-    <li><a href="https://github.com/bglglzd/bugkit/tree/main/recipes">recipes/</a> — 7 sink adapters (DB, GitHub Issues, Telegram, JSONL, email, Slack/Discord, CLI)</li>
-    <li><a href="https://github.com/bglglzd/bugkit/blob/main/INSTALL.md">INSTALL.md</a> — universal paste-in prompt</li>
-    <li><a href="https://github.com/bglglzd/bugkit/blob/main/examples/ai-context-output.txt">Example AI context output</a></li>
-  </ul>
-
-  <footer>
-    MIT licensed · <a href="https://github.com/bglglzd/bugkit">Star on GitHub</a>
-  </footer>
-
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const buttons = document.querySelectorAll('.tab-button');
-  const panels = document.querySelectorAll('.tab-panel');
-  buttons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const t = btn.dataset.tab;
-      buttons.forEach(b => b.classList.toggle('active', b === btn));
-      panels.forEach(p => p.classList.toggle('active', p.id === 'tab-' + t));
-    });
-  });
-
-  document.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const targetId = btn.dataset.copy;
-      const target = document.getElementById(targetId);
-      if (!target) return;
-      try {
-        await navigator.clipboard.writeText(target.innerText);
-        const old = btn.innerText;
-        btn.innerText = 'Copied';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.innerText = old; btn.classList.remove('copied'); }, 1200);
-      } catch {
-        btn.innerText = 'Copy failed';
-      }
-    });
-  });
-
-  // Per-step copy buttons on the Claude Code tab
-  document.querySelectorAll('.step-copy-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const text = btn.dataset.copyText || '';
-      try {
-        await navigator.clipboard.writeText(text);
-        const old = btn.innerText;
-        btn.innerText = 'Copied';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.innerText = old; btn.classList.remove('copied'); }, 1200);
-      } catch {
-        btn.innerText = 'Copy failed';
-      }
-    });
-  });
-});
-</script>
-
 </body>
 </html>

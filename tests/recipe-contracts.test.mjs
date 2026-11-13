@@ -7,6 +7,8 @@ import test from 'node:test'
 
 import {snippet, load, report} from './helpers.mjs'
 
+const stableContext = value => value.replace(/(<<<(?:BEGIN|END) USER-DATA )[^>]+(>>>)/g, '$1NONCE$2')
+
 test('install instructions name the registered marketplace and advertised voice command exists', async () => {
   const marketplace = JSON.parse(await readFile(new URL('../.claude-plugin/marketplace.json', import.meta.url)))
   for (const file of ['README.md', 'INSTALL.md', 'docs/index.html']) {
@@ -35,7 +37,7 @@ test('CLI context reuses the canonical formatter instead of a second section lay
   const {buildCLIContext} = load(await snippet('recipes/cli-tool.md', '## AI context format for CLI'), ['buildCLIContext'], {buildAIContext})
   const input = {...report, environment: {...report.environment, platform: 'cli'}, logs: {console: ['Command: synthetic-tool check', 'CWD: /synthetic/project']}}
   const hint = 'synthetic-tool bug close synthetic-report "<note>"'
-  assert.equal(buildCLIContext(input, hint), buildAIContext(input, hint))
+  assert.equal(stableContext(buildCLIContext(input, hint)), stableContext(buildAIContext(input, hint)))
   assert.match(buildCLIContext(input, hint), /by @fixture/)
 })
 
@@ -100,7 +102,7 @@ test('GitHub CLI uses direct argv/body-file stdin, preserves literal title and p
   assert.equal(captured.command, 'gh'); assert.equal(captured.options.shell, false)
   assert.equal(captured.args[captured.args.indexOf('--title') + 1], title)
   assert.equal(captured.args[captured.args.indexOf('--body-file') + 1], '-')
-  assert.equal(body, buildAIContext({...report, title}, hint))
+  assert.equal(stableContext(body), stableContext(buildAIContext({...report, title}, hint)))
   assert.ok(!body.includes('PATCH /api/bug-reports/'))
   await createGhIssue({...report, type: 'feature'}, hint)
   assert.equal(captured.args[captured.args.indexOf('--label') + 1], 'bugkit,feature')

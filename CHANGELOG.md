@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0 — 2026-11-13
+
+- Added the standalone BugKit MARK Chrome extension, local demo, session drafts and Markdown/JSON/PNG export.
+- Added a ready-to-load ZIP, source-bound build manifest and automated real-Chromium acceptance checks.
+- Replaced the project logo with an ImageGen asset and updated README, Pages, English/Russian setup and troubleshooting.
+- Unified plugin and universal installer requirements: upgrades preserve reports and verify recovery, authorization and closure.
+- Framed the shared recipe context as untrusted data, added baseline/application masking and text-only export, and tolerated malformed optional blocks.
+- Retained the existing MIT license, recipe adapters and BugKit v1 field/status compatibility.
+
 ## Unreleased
 
 - Match install commands to the registered marketplace and provide the advertised

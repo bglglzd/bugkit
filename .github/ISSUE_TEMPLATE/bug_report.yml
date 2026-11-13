@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible extension or integration-example defect.
+body:
+  - type: markdown
+    attributes:
+      value: Remove private text, URLs, credentials and screenshot data before posting. Use SECURITY.md for vulnerabilities.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Chrome extension, Application installer, Recipe or specification, Documentation]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: BugKit version and browser/runtime
+      placeholder: "1.1.0; Chrome version; Windows/macOS/Linux"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps, expected result and actual result
+      description: Include a small synthetic example when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Sanitized context or error

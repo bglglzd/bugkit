@@ -1,107 +1,37 @@
-# bugkit — universal install prompt
+# Install BugKit
 
-> **How to use this file (not Claude Code):**
->
-> - **Cursor / Copilot Chat / ChatGPT / Codex / Gemini CLI / Aider / Cline:** paste this into your AI chat:
->
->   ```
->   Install bugkit in this project from https://raw.githubusercontent.com/bglglzd/bugkit/main/INSTALL.md
->   ```
->
->   The agent fetches this file and follows it.
->
-> - **Any AI agent that doesn't auto-fetch URLs:** copy the content below the `---` line into the chat directly.
->
-> **Claude Code users should NOT use this file.** Run `/plugin marketplace add bglglzd/bugkit`, `/plugin install bugkit@bugkit`, then `/bugkit:install` instead.
+## Use the Chrome extension
+
+Download **BugKit-MARK-1.1.0.zip** from [GitHub Releases](https://github.com/bglglzd/bugkit/releases/latest), extract it, then load its **extension** folder at `chrome://extensions` with Developer mode enabled. Click the toolbar icon or press Ctrl+Shift+Y (⌘+Shift+Y on macOS). No development tools or application changes are required.
+
+See the [Russian walkthrough](docs/INSTALL.ru.md) and [extension reference](docs/EXTENSION.md) for updates, permissions and recovery.
+
+## Integrate reporting into a project
+
+Claude Code:
+
+```text
+/plugin marketplace add bglglzd/bugkit
+/plugin install bugkit@bugkit
+/bugkit:install
+```
+
+Other coding agents can read the task below. These are installer instructions for a project that has explicitly requested BugKit integration.
 
 ---
 
-You are installing **bugkit** — a portable, AI-friendly bug report system — into the current project. The value: reports carry enough context (URL, element selector, stack trace, viewport, etc.) that an AI assistant can fix the bug from one paste. The data contract is standardized in **bugkit Spec v1** so the "Copy Context → Paste → Fix → Close" ritual is identical across any project that installs it.
+Implement BugKit in the current project. Read its development instructions and existing reporting code before changing files. If BugKit already exists, audit and upgrade it; preserve reports, IDs, original descriptions and working integrations.
 
-## Step 1 — Understand the project
+1. **Inspect.** Identify the stack, UI, authentication, storage, tenant boundaries, notification delivery and deployment version source. Reuse them. Summarize the core journey, a representative failure/recovery, and the files to change.
+2. **Choose storage.** Honor the user's existing choice. Otherwise recommend the existing database, or JSONL for a local tool. Ask one storage question only if unresolved. External delivery needs explicitly configured credentials; it is optional when local storage is primary.
+3. **Read the contract.** Fetch `SPEC.md`, `HARDENING.md` and the matching file under `recipes/` from this repository at the same full commit SHA. Prefer bundled plugin/checkout files. Resolve relative links against this repository, not the host project. Do not mix snapshots or overwrite a working integration with an older sample.
+4. **Implement the complete journey.** Preserve `bugkit_spec: "1"`, canonical fields, IDs and statuses. Follow the recipe, then implement every applicable HARDENING requirement. Small recipe snippets are examples, not a finished server. Use one formatter for CLI and Copy Context. Keep untrusted content in a fresh nonce-delimited block; apply the project's masking function by default. Review unknown reporters' requests before implementing them.
+5. **Recover safely.** Use one main description, optional reproduction fields, explicit element/screenshot actions, an account-scoped session draft, clear-on-logout, and non-destructive failure handling. Picking a link must not navigate or close the inspected popup. Capture pointers at `window`, ignore the widget UI and restore listeners/focus on cancellation. Retain text after submission failure or stale-deployment errors.
+6. **Make the server authoritative.** Derive author, tenant, permissions and build from server state. Bound context/attachments. Apply one access boundary to lists, detail, exports, edits, attachments and batches. Preserve originals on edit. Close through one operation with `resolution`, separate `user_note` and verification steps for fixes; validate a whole batch before writes. Store notification intent with the result and retry delivery without duplication. Never bypass closure with raw SQL.
+7. **Verify through the real UI or CLI.** Create a synthetic report, select an element, recover a draft, fail a submission, inspect stored data, copy context, resolve and verify the author's state. Test unauthorized/cross-tenant access where applicable, a failed batch and delivery retry. Run relevant host build/tests. Record actual checks and blockers; mocked providers do not prove live delivery.
+8. **Optional voice.** Offer it after the main journey passes. Read `skills/adding-voice/SKILL.md`. Explain browser support/provider processing; offer local Whisper for offline use. Do not add paid services without the user's request.
+9. **Handoff.** List files, storage choice, entry point, reproducible verification, update/rollback instructions and limits. Save an integration note in the host's existing docs so future upgrades do not need rediscovery.
 
-1. **Stack** — read `package.json` / `go.mod` / `Cargo.toml` / `pyproject.toml` / `requirements.txt` / `composer.json` / `Gemfile` / etc.
-2. **Shape** — full-stack web app, API-only backend, CLI tool, static site, mobile app, bot, other.
-3. **Existing infra** — database, auth, notifications layer, CI/CD. Reuse what exists.
-4. **Conventions** — skim `CLAUDE.md`, `AGENTS.md`, a source file or two. Match the project's style.
+Recipes: [database/web app](recipes/web-app-full.md), [GitHub Issues](recipes/github-issues.md), [Telegram](recipes/telegram-bot.md), [JSONL](recipes/jsonl-file.md), [email](recipes/email.md), [Slack/Discord](recipes/slack-discord.md), [CLI](recipes/cli-tool.md).
 
-Report back three bullets on what you found, then continue.
-
-## Step 2 — Ask ONE question
-
-Ask the user:
-
-> **Where should bug reports be stored or delivered?** Pick one:
-> 1. **Local DB** (recommended if the project has one) — full admin UI with status tracking
-> 2. **GitHub Issues** — no DB needed; bugs open as issues with a `bugkit` label
-> 3. **Telegram** — bugs get DM'd to a chat via bot token
-> 4. **JSONL file** — simplest; append to `./.bugreports.jsonl`. Local-only.
-> 5. **Email** — send via SMTP / SendGrid / Resend
-> 6. **Slack** / **Discord** — webhook to a channel
-> 7. **Multiple** — e.g. "DB + mirror to Telegram for notifications"
-
-Recommend based on stack if unsure:
-- Full-stack web app with a DB → option 1
-- Open-source CLI / static site → option 2
-- Personal / MVP → option 4, upgrade later
-- Solo dev in Telegram → option 3
-
-## Step 3 — Fetch the matching recipe and implement
-
-| Sink | Recipe URL |
-|---|---|
-| Local DB | `https://raw.githubusercontent.com/bglglzd/bugkit/main/recipes/web-app-full.md` |
-| GitHub Issues | `https://raw.githubusercontent.com/bglglzd/bugkit/main/recipes/github-issues.md` |
-| Telegram | `https://raw.githubusercontent.com/bglglzd/bugkit/main/recipes/telegram-bot.md` |
-| JSONL | `https://raw.githubusercontent.com/bglglzd/bugkit/main/recipes/jsonl-file.md` |
-| Email | `https://raw.githubusercontent.com/bglglzd/bugkit/main/recipes/email.md` |
-| Slack / Discord | `https://raw.githubusercontent.com/bglglzd/bugkit/main/recipes/slack-discord.md` |
-| CLI | `https://raw.githubusercontent.com/bglglzd/bugkit/main/recipes/cli-tool.md` |
-
-Fetch the chosen recipe and follow it. Non-negotiables from the spec (`https://raw.githubusercontent.com/bglglzd/bugkit/main/SPEC.md`):
-
-1. **Field names** — use exactly: `id, type, title, description, status, created_at, reporter, environment, page, client, element, error, logs, attachments, resolution, resolved_at, resolved_by, commit_sha, how_to_verify`. Do not rename.
-2. **Status lifecycle** — `open → in_progress → resolved → closed`, plus terminal `wontfix`. Resolution required when moving to a terminal state.
-3. **AI context format** — admins MUST be able to produce the exact text block from SPEC.md §3. Do not reorder sections, do not invent new labels.
-4. **`bugkit_spec: "1"`** — include in stored reports.
-
-## Step 4 — Offer voice transcription (web recipes only)
-
-If the chosen recipe produces a browser-facing form (Local DB, GitHub Issues, or similar), after the main install succeeds, ask:
-
-> **Voice transcription lets reporters speak their bug description instead of typing. Uses the browser's Web Speech API by default — free, no keys, works in Chrome/Edge/Safari. Want to enable it? (Y/n)**
-
-If yes, add a 🎤 mic button next to the description textarea. Wire up the Web Speech API per `recipes/web-app-full.md §Voice (optional)`. Optional upgrade: local Whisper (whisper.cpp) via a thin `/api/bugkit/transcribe` proxy. Never suggest a paid API unless the user explicitly asks.
-
-## Step 5 — Verify
-
-Before declaring done:
-
-1. Submit a test report using the actual UI / CLI / bot command (not curl — the real flow).
-2. Confirm the report appears in the chosen sink.
-3. Generate the Copy-Context output and verify it matches SPEC.md §3 — section order, exact labels, no extra decoration.
-4. If applicable, change status to `resolved` with a short note and confirm the reporter would see the update.
-
-## Step 6 — Report back
-
-1. Sink chosen.
-2. Files created or modified.
-3. How to test it (URL, command, or interaction).
-4. How the admin copies context and closes the loop once a fix is in.
-5. Whether voice is enabled and which path it's using.
-
-## Things to avoid
-
-- Don't pull in a heavy ORM or new DB just for this — use what's there, or JSONL.
-- Don't rename spec field names. Add new fields or map. Portability is the point.
-- Don't make the element picker fancy. Minimal: outline on hover, click to capture, Esc to cancel.
-- Don't gate bug reporting behind complex auth flows.
-- Don't skip the reporter notification on status change.
-- Don't ask more than the one sink question + optional voice question.
-
-## If you get stuck
-
-- Read SPEC.md in full.
-- Read the chosen recipe in full.
-- Compose from multiple recipes if needed — but keep the Copy-Context format unchanged.
-- Ask the user for one missing piece at a time.
+Source: [bglglzd/bugkit](https://github.com/bglglzd/bugkit). These instructions do not authorize contacting users, publishing code or modifying production data.

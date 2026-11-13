@@ -187,7 +187,8 @@ test('Resend SDK rejection is surfaced even when its promise resolves', async ()
 
 test('email and chat payloads propagate the actual JSONL close command and reject an omitted hint', async () => {
   const buildAIContext = await contextBuilder()
-  const expected = buildAIContext(report, localCloseHint)
+  const stable = text => text.replace(/(<<<(?:BEGIN|END) USER-DATA )[^>]+(>>>)/g, '$1NONCE$2')
+  const expected = stable(buildAIContext(report, localCloseHint))
   let payload, sends = 0
   class Resend { constructor() { this.emails = {send: async input => { payload = input; sends++; return {data: {id: 'synthetic-mail'}, error: null} }} } }
   const {sendBugByEmail} = load(await snippet('recipes/email.md', '## Implementation sketch (Resend)'), ['sendBugByEmail'], {
@@ -196,7 +197,7 @@ test('email and chat payloads propagate the actual JSONL close command and rejec
   await assert.rejects(sendBugByEmail(report), /update hint is required/)
   assert.equal(sends, 0)
   await sendBugByEmail(report, localCloseHint)
-  assert.equal(payload.text, expected); assert.equal(payload.html, expected)
+  assert.equal(stable(payload.text), expected); assert.equal(stable(payload.html), expected)
   assert.ok(!payload.text.includes('PATCH /api/bug-reports/'))
   await localService(async ({origin, guardedFetch, requests}) => {
     const {postToChat} = load(await snippet('recipes/slack-discord.md', '## Implementation (minimal)'), ['postToChat'], {
@@ -207,8 +208,8 @@ test('email and chat payloads propagate the actual JSONL close command and rejec
     assert.equal(requests.length, 0)
     await postToChat(report, localCloseHint)
     const slack = requests.filter(request => request.path === '/slack').map(request => JSON.parse(request.raw).blocks[0].text.text).join('')
-    assert.equal(slack, expected)
-    assert.ok(requests.find(request => request.path.startsWith('/discord')).raw.includes(expected))
+    assert.equal(stable(slack), expected)
+    assert.ok(requests.find(request => request.path.startsWith('/discord')).raw.replace(/(<<<(?:BEGIN|END) USER-DATA )[^>]+(>>>)/g, '$1NONCE$2').includes(expected))
     assert.ok(!slack.includes('PATCH /api/bug-reports/'))
   })
 })
