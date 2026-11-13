@@ -258,8 +258,10 @@ function buildAIContext(r: BugReport, updateHint = `PATCH /api/bug-reports/${enc
   }
   const obj = (value: unknown): any => value && typeof value === 'object' && !Array.isArray(value) ? value : {}
   // Optional malformed blocks do not take down the queue or export.
-  r = {...r, environment: obj(r.environment), page: obj(r.page), client: obj(r.client),
-    element: obj(r.element || r.element_context), error: obj(r.error), logs: obj(r.logs),
+  r = {...r, environment: obj(r.environment),
+    page: {url: r.page_url, ...obj(r.page)},
+    client: {viewport: r.viewport, user_agent: r.user_agent, ...obj(r.client)},
+    element: {...obj(r.element_context), ...obj(r.element)}, error: obj(r.error), logs: obj(r.logs),
     attachments: Array.isArray(r.attachments) ? r.attachments.filter(a => a && typeof a === 'object') : []}
   if (options.textOnly) r = {...r, environment: {}, page: {}, client: {}, element: {}, error: {}, logs: {}, attachments: [],
     element_context: undefined, page_url: undefined, viewport: undefined, user_agent: undefined}

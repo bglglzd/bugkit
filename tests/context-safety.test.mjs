@@ -36,3 +36,16 @@ test('text-only mode removes automatic context including legacy flattened fields
   assert.match(result, /Synthetic broken button report/)
   assert.ok(!result.includes('private.invalid'))
 })
+
+test('legacy flattened page and client fields survive absent or malformed nested blocks', () => {
+  for (const nested of [undefined, null, [], 'invalid']) {
+    const input = {...report, page: nested, client: nested, page_url: 'https://example.invalid/legacy', viewport: '800x600', user_agent: 'Legacy synthetic UA'}
+    const result = buildAIContext(input)
+    assert.match(result, /URL: https:\/\/example.invalid\/legacy/)
+    assert.match(result, /Viewport: 800x600/)
+    assert.match(result, /User Agent: Legacy synthetic UA/)
+  }
+  const result = buildAIContext({...report, page_url: 'https://example.invalid/legacy', viewport: '800x600'})
+  assert.match(result, /URL: https:\/\/example.invalid\/problem/)
+  assert.match(result, /Viewport: 1200x800/)
+})
