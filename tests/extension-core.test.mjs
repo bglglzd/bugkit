@@ -110,4 +110,3 @@ test('untrusted report data cannot predict or close the per-export nonce fence',
 test('one-field report derives its title from the first description line', () => {
   assert.equal(core.buildReport({...form, description: 'Кнопка не работает\nВторая строка.'}, context).title, 'Кнопка не работает')
 })
-

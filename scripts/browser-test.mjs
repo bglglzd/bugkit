@@ -164,4 +164,3 @@ try {
   if (!resolvedProfile.startsWith(temporary + sep) || !basename(resolvedProfile).startsWith('bugkit-browser-')) throw Error('Unsafe test-profile cleanup path')
   await rm(resolvedProfile, {recursive: true, force: true})
 }
-
