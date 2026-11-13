@@ -140,8 +140,15 @@ async function handleMessage(message, sender) {
   const context = senderContext(sender)
   const pageUrl = requestedPageUrl(message, context)
   if (message.type === 'mark:capture') {
-    if (pageUrl !== context.url) throw Error('Страница изменилась. Повторите снимок на нужной странице.')
-    return capturePage(context)
+    // MessageSender.url can retain the injection URL after history.pushState.
+    // Validate the requested route against Chrome's current tab, then check again
+    // before and after capture so a navigation cannot attach another page.
+    const current = await chrome.tabs.get(context.tabId)
+    if (!supportedPage(current.url) || current.url !== pageUrl
+        || new URL(current.url).origin !== new URL(context.url).origin) {
+      throw Error('Страница изменилась. Повторите снимок на нужной странице.')
+    }
+    return capturePage({...context, url: current.url})
   }
   return queueDraftOperation(async () => {
     const key = await draftKey(context.tabId, pageUrl)

@@ -139,6 +139,21 @@ test('capture discards screenshot if sender navigates or moves windows', async (
   assert.equal((await moved.message({type: 'mark:capture'})).ok, false)
 })
 
+test('capture after same-origin SPA navigation uses current tab URL rather than stale sender URL', async () => {
+  const f = fixture()
+  const staleSender = f.sender()
+  f.tab.url = 'https://example.test/new-route?view=second'
+  const result = await f.message({type: 'mark:capture', pageUrl: f.tab.url}, staleSender)
+  assert.equal(result.ok, true)
+  assert.equal(f.calls.captures.length, 1)
+  const staleRequest = await f.message({type: 'mark:capture', pageUrl: staleSender.url}, staleSender)
+  assert.equal(staleRequest.ok, false)
+  f.tab.url = 'https://other.test/private'
+  const crossOrigin = await f.message({type: 'mark:capture', pageUrl: f.tab.url}, staleSender)
+  assert.equal(crossOrigin.ok, false)
+  assert.equal(f.calls.captures.length, 1)
+})
+
 test('messages reject iframe, external and extension-page senders', async () => {
   const f = fixture()
   for (const override of [
